@@ -11,6 +11,13 @@
             "name": "Main",
             "request": "launch",
             "mainClass": "Main",
+            "projectName": "8pool_32f4ce4f"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "Main",
             "projectName": "8poll_32f4cdf2"
         },
         {
