@@ -83,6 +83,12 @@ public class Ball {
         this.pocketed = pocketed;
     }
 
+    public boolean isMoving() {
+        double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+        return speed > 0.05;
+    }
+
+
     public void reset() {
         this.velocityX = 0;
         this.velocityY = 0;
