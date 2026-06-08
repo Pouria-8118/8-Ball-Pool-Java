@@ -1,45 +1,69 @@
 package model;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Table {
 
-    public static final int X = 80;
-    public static final int Y = 60;
-    public static final int WIDTH = 800;
-    public static final int HEIGHT = 400;
-    public static final int POCKET_RADIUS = 18;
-    public static final int RAIL_THICKNESS = 20;
+    private int x;
+    private int y;
+    private int width;
+    private int height;
+    private List<Pocket> pockets;
 
-    private List<Point> pockets;
-
-    public Table() {
-        pockets = new ArrayList<Point>();
+    public Table(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.pockets = new ArrayList<>();
+        initializePockets();
     }
 
-    public List<Point> getPockets() {
+    private void initializePockets() {
+        int px = x;
+        int py = y;
+        int pw = width;
+        int ph = height;
+
+        pockets.add(new Pocket(px, py));
+        pockets.add(new Pocket(px + pw / 2, py));
+        pockets.add(new Pocket(px + pw, py));
+        pockets.add(new Pocket(px, py + ph));
+        pockets.add(new Pocket(px + pw / 2, py + ph));
+        pockets.add(new Pocket(px + pw, py + ph));
+    }
+
+    public int getX() {
+        return x;
+    }
+    public int getY() {
+        return y;
+    }
+    public int getWidth() {
+        return width;
+    }
+    public int getHeight() {
+        return height;
+    }
+    public List<Pocket> getPockets() {
         return pockets;
     }
 
-    public int getLeft() {
-        return X + RAIL_THICKNESS;
+    public int getLeftWall() {
+        return x;
+    }
+    public int getRightWall() {
+        return x + width;
+    }
+    public int getTopWall() {
+        return y;
+    }
+    public int getBottomWall() {
+        return y + height;
     }
 
-    public int getRight() {
-        return X + WIDTH - RAIL_THICKNESS;
-    }
-
-    public int getTop() {
-        return Y + RAIL_THICKNESS;
-    }
-
-    public int getBottom() {
-        return Y + HEIGHT - RAIL_THICKNESS;
-    }
-
-    public int getBreakLineX() {
-        return X + WIDTH / 4;
+    public int getBreakLineX() { 
+        return x + width / 4;
     }
 }
