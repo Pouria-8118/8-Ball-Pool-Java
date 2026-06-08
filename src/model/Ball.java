@@ -31,24 +31,31 @@ public class Ball {
     }
 
     public boolean isMoving() {
-        return Math.abs(velocityX) > 0.01 || Math.abs(velocityY) > 0.01;
+        return Math.sqrt(velocityX * velocityX + velocityY * velocityY) > 0.08;
     }
 
     public void applyFriction(double friction) {
+        applyFriction(friction, 0.08);
+    }
+
+    public void applyFriction(double friction, double stopThreshold) {
         velocityX *= friction;
         velocityY *= friction;
-        if (Math.abs(velocityX) < 0.01) {
+        double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+        if (speed < stopThreshold) {
             velocityX = 0;
-        }
-        if (Math.abs(velocityY) < 0.01) {
             velocityY = 0;
         }
     }
 
     public void update() {
+        update(1.0);
+    }
+
+    public void update(double dt) {
         if (!isPocketed) {
-            x += velocityX;
-            y += velocityY;
+            x += velocityX * dt;
+            y += velocityY * dt;
         }
     }
 
