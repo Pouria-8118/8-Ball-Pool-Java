@@ -119,5 +119,46 @@ public class GameState {
     public boolean isTableOpen() {
         return tableOpen;
     }
+    public void setTableOpen(boolean open) {
+        this.tableOpen = open;
+    }
+
+    public boolean isBreakDone() {
+        return breakDone;
+    }
+
+    public void setBreakDone(boolean done) {
+        this.breakDone = done;
+    }
+
+    public String getWinnerName() {
+        return winnerName;
+    }
+
+    public void setWinnerName(String name) {
+        this.winnerName = name;
+    }
+
+    public boolean allBallsStopped() {
+        for (int i = 0; i < balls.size(); i++) {
+            Ball b = balls.get(i);
+            if (!b.isPocketed() && b.isMoving()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int countRemainingBalls(int type) {
+        int count = 0;
+        for (int i = 0; i < balls.size(); i++) {
+            Ball b = balls.get(i);
+            if (b.getType() == type && !b.isPocketed()) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
 
 }
