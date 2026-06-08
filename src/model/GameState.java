@@ -76,5 +76,48 @@ public class GameState {
     public int getCurrentPlayerIndex() {
         return currentPlayerIndex;
     }
+    public List<Ball> getBalls() {
+        return balls;
+    }
+
+    public void setBalls(List<Ball> balls) {
+        this.balls = balls;
+    }
+
+    public Ball getCueBall() {
+        return cueBall;
+    }
+
+    public void setCueBall(Ball cueBall) {
+        this.cueBall = cueBall;
+    }
+
+    public int getSelectedPocketIndex() {
+        return selectedPocketIndex;
+    }
+
+    public void setSelectedPocketIndex(int index) {
+        this.selectedPocketIndex = index;
+    }
+
+    public int getSelectedSpin() {
+        return selectedSpin;
+    }
+
+    public void setSelectedSpin(int spin) {
+        this.selectedSpin = spin;
+    }
+
+    public int getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(int state) {
+        this.gameState = state;
+    }
+
+    public boolean isTableOpen() {
+        return tableOpen;
+    }
 
 }
