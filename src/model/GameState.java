@@ -43,5 +43,38 @@ public class GameState {
         winnerName = null;
     }
 
+    public Player getCurrentPlayer() {
+        if (currentPlayerIndex == 0) {
+            return player1;
+        }
+        return player2;
+    }
+
+    public Player getOtherPlayer() {
+        if (currentPlayerIndex == 0) {
+            return player2;
+        }
+        return player1;
+    }
+
+    public void switchTurn() {
+        if (currentPlayerIndex == 0) {
+            currentPlayerIndex = 1;
+        } else {
+            currentPlayerIndex = 0;
+        }
+    }
+
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
+    public int getCurrentPlayerIndex() {
+        return currentPlayerIndex;
+    }
 
 }
