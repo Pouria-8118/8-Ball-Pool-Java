@@ -6,7 +6,8 @@ import model.Table;
 
 public class CollisionHandler {
 
-    private static final double WALL_RESTITUTION = 0.70;
+    private static final double WALL_RESTITUTION = 0.45;
+    private static final double BALL_RESTITUTION = 0.92;
 
     public void handleWallCollision(Ball ball, Table table) {
         int r = Ball.RADIUS;
@@ -19,24 +20,31 @@ public class CollisionHandler {
             ball.setX(left);
             if (ball.getVelocityX() < 0) {
                 ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
+                ball.setVelocityY(ball.getVelocityY() * WALL_RESTITUTION);
             }
         }
+
         if (ball.getX() > right) {
             ball.setX(right);
             if (ball.getVelocityX() > 0) {
                 ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
+                ball.setVelocityY(ball.getVelocityY() * WALL_RESTITUTION);
             }
         }
+
         if (ball.getY() < top) {
             ball.setY(top);
             if (ball.getVelocityY() < 0) {
                 ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
+                ball.setVelocityX(ball.getVelocityX() * WALL_RESTITUTION);
             }
         }
+
         if (ball.getY() > bottom) {
             ball.setY(bottom);
             if (ball.getVelocityY() > 0) {
                 ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
+                ball.setVelocityX(ball.getVelocityX() * WALL_RESTITUTION);
             }
         }
     }
@@ -83,9 +91,8 @@ public class CollisionHandler {
         double bVtx = b.getVelocityX() - bVn * nx;
         double bVty = b.getVelocityY() - bVn * ny;
 
-        double restitution = 0.95;
-        double newAVn = bVn * restitution;
-        double newBVn = aVn * restitution;
+        double newAVn = bVn * BALL_RESTITUTION;
+        double newBVn = aVn * BALL_RESTITUTION;
 
         a.setVelocityX(aVtx + newAVn * nx);
         a.setVelocityY(aVty + newAVn * ny);

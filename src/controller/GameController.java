@@ -420,12 +420,15 @@ public class GameController {
         String p2 = gameState.getPlayer2().getName();
         startNewGame(p1, p2);
     }
-
     private void switchTurn() {
         Player current = gameState.getCurrentPlayer();
         current.setBallInHand(false);
         gameState.setCurrentPlayer(gameState.getOpponent(current));
-    }
+        Player next = gameState.getCurrentPlayer();
+        gamePanel.showAnnouncement(next.getName() + "'s Turn");
+}
 
-    public GameState getGameState() { return gameState; }
+    public GameState getGameState() { 
+        return gameState; 
+    }
 }
