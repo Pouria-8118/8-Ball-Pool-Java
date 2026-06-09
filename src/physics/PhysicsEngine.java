@@ -11,7 +11,7 @@ import java.util.List;
 public class PhysicsEngine {
 
     private static final int    SUBSTEPS           = 6;
-    private static final double FRICTION_PER_FRAME = 0.982;
+    private static final double FRICTION_PER_FRAME = 0.980;
     private static final double STOP_SPEED         = 0.11;
     private static final double POCKET_PULL_RADIUS = Pocket.RADIUS * 1.2;
     private static final double POCKET_ANIM_SPEED  = 0.06;
@@ -60,9 +60,10 @@ public class PhysicsEngine {
                 continue;
             }
 
-            double newVx = ball.getVelocityX() * friction;
-            double newVy = ball.getVelocityY() * friction;
-            double speed = Math.sqrt(newVx * newVx + newVy * newVy);
+            Vector vel = new Vector(ball.getVelocityX(), ball.getVelocityY());
+            vel = vel.scale(friction);
+            
+            double speed = vel.length();
 
             if (speed < STOP_SPEED) {
                 ball.setVelocityX(0);
@@ -70,10 +71,10 @@ public class PhysicsEngine {
                 continue;
             }
 
-            ball.setVelocityX(newVx);
-            ball.setVelocityY(newVy);
-            ball.setX(ball.getX() + newVx / SUBSTEPS);
-            ball.setY(ball.getY() + newVy / SUBSTEPS);
+            ball.setVelocityX(vel.getX());
+            ball.setVelocityY(vel.getY());
+            ball.setX(ball.getX() + vel.getX() / SUBSTEPS);
+            ball.setY(ball.getY() + vel.getY() / SUBSTEPS);
         }
     }
 
@@ -83,15 +84,14 @@ public class PhysicsEngine {
                 continue;
             }
 
-            double prevVx = ball.getVelocityX();
-            double prevVy = ball.getVelocityY();
+            Vector prevVel = new Vector(ball.getVelocityX(), ball.getVelocityY());
 
             collisionHandler.handleWallCollision(ball, state.getTable());
 
-            boolean xFlipped = (prevVx > 0.1 && ball.getVelocityX() < 0)
-                    || (prevVx < -0.1 && ball.getVelocityX() > 0);
-            boolean yFlipped = (prevVy > 0.1 && ball.getVelocityY() < 0)
-                    || (prevVy < -0.1 && ball.getVelocityY() > 0);
+            Vector currVel = new Vector(ball.getVelocityX(), ball.getVelocityY());
+            
+            boolean xFlipped = prevVel.getX() * currVel.getX() < 0;
+            boolean yFlipped = prevVel.getY() * currVel.getY() < 0;
 
             if (xFlipped || yFlipped) {
                 wallHitsThisTurn++;
@@ -131,9 +131,10 @@ public class PhysicsEngine {
             }
 
             for (Pocket pocket : pockets) {
-                double dx   = ball.getX() - pocket.getX();
-                double dy   = ball.getY() - pocket.getY();
-                double dist = Math.sqrt(dx * dx + dy * dy);
+                Vector ballPos = new Vector(ball.getX(), ball.getY());
+                Vector pocketPos = new Vector(pocket.getX(), pocket.getY());
+                Vector diff = ballPos.subtract(pocketPos);
+                double dist = diff.length();
 
                 if (dist < POCKET_PULL_RADIUS) {
                     startPocketing(ball, pocket);
@@ -142,9 +143,11 @@ public class PhysicsEngine {
 
                 if (dist < Pocket.RADIUS * 1.8) {
                     double pullStrength = 0.08;
-                    double angle        = Math.atan2(dy, dx);
-                    ball.setVelocityX(ball.getVelocityX() - Math.cos(angle) * pullStrength);
-                    ball.setVelocityY(ball.getVelocityY() - Math.sin(angle) * pullStrength);
+                    Vector dir = diff.normalize();
+                    Vector pull = dir.scale(pullStrength);
+                    Vector newVel = new Vector(ball.getVelocityX(), ball.getVelocityY()).subtract(pull);
+                    ball.setVelocityX(newVel.getX());
+                    ball.setVelocityY(newVel.getY());
                 }
             }
         }
@@ -182,26 +185,27 @@ public class PhysicsEngine {
             return;
         }
 
-        double speed = Math.sqrt(
-                cueBall.getVelocityX() * cueBall.getVelocityX() +
-                cueBall.getVelocityY() * cueBall.getVelocityY()
-        );
+        Vector vel = new Vector(cueBall.getVelocityX(), cueBall.getVelocityY());
+        double speed = vel.length();
 
-        if (speed < 0.5) {
+        if (speed < 0.8) {
             return;
         }
 
-        double nx = cueBall.getVelocityX() / speed;
-        double ny = cueBall.getVelocityY() / speed;
+        Vector dir = vel.normalize();
 
         if (spin == SpinType.TOP) {
-            cueBall.setVelocityX(cueBall.getVelocityX() + nx * 0.04);
-            cueBall.setVelocityY(cueBall.getVelocityY() + ny * 0.04);
+            Vector topForce = dir.scale(0.012);
+            Vector newVel = vel.add(topForce);
+            cueBall.setVelocityX(newVel.getX());
+            cueBall.setVelocityY(newVel.getY());
         }
 
         if (spin == SpinType.BACK) {
-            cueBall.setVelocityX(cueBall.getVelocityX() - nx * 0.07);
-            cueBall.setVelocityY(cueBall.getVelocityY() - ny * 0.07);
+            Vector backForce = dir.scale(-0.05);
+            Vector newVel = vel.add(backForce);
+            cueBall.setVelocityX(newVel.getX());
+            cueBall.setVelocityY(newVel.getY());
         }
     }
 
