@@ -275,6 +275,7 @@ public class GameController {
         List<Ball> pocketed    = physicsEngine.getPocketedThisTurn();
         boolean    cuePocketed = physicsEngine.isCueBallPocketed();
         Ball       firstHit    = physicsEngine.getFirstHitBall();
+        int        wallHits    = physicsEngine.getWallHitsThisTurn();
         Player     current     = gameState.getCurrentPlayer();
         Player     opponent    = gameState.getOpponent(current);
 
@@ -288,6 +289,11 @@ public class GameController {
                 handleEightBall(current, opponent, cuePocketed);
                 return;
             }
+        }
+
+        if (pocketed.isEmpty() && wallHits == 0) {
+            doFoul(current, opponent, cuePocketed);
+            return;
         }
 
         boolean foul = isFoul(current, firstHit, cuePocketed);
@@ -317,11 +323,6 @@ public class GameController {
 
         gameState.setSelectedPocket(null);
         gameState.setSelectedSpin(SpinType.NONE);
-
-        if (!scoredOwn && pocketed.isEmpty()) {
-            doFoul(current, opponent, false);
-            return;
-        }
 
         if (scoredOwn) {
             Color c = (current == gameState.getPlayer1())
