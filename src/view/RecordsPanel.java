@@ -3,116 +3,128 @@ package view;
 import controller.DatabaseController;
 import model.GameRecord;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 
 public class RecordsPanel extends JPanel {
 
-    private DatabaseController databaseController;
-    private JPanel recordsListPanel;
-    private JButton backButton;
+    private DatabaseController dbController;
+    private JPanel             listPanel;
 
     public RecordsPanel() {
-        this.databaseController = new DatabaseController();
-        setBackground(new Color(20, 20, 30));
+        this.dbController = new DatabaseController();
+        setBackground(new Color(12, 12, 20));
         setLayout(new BorderLayout());
-        initComponents();
+        buildUI();
     }
 
-    private void initComponents() {
+    private void buildUI() {
         JLabel title = new JLabel("Game Records", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 32));
-        title.setForeground(Color.WHITE);
-        title.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
+        title.setFont(new Font("Georgia", Font.BOLD, 36));
+        title.setForeground(new Color(200, 170, 80));
+        title.setBorder(BorderFactory.createEmptyBorder(40, 0, 20, 0));
         add(title, BorderLayout.NORTH);
 
-        recordsListPanel = new JPanel();
-        recordsListPanel.setBackground(new Color(20, 20, 30));
-        recordsListPanel.setLayout(new BoxLayout(recordsListPanel, BoxLayout.Y_AXIS));
+        listPanel = new JPanel();
+        listPanel.setBackground(new Color(12, 12, 20));
+        listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
+        listPanel.setBorder(BorderFactory.createEmptyBorder(0, 60, 0, 60));
 
-        JScrollPane scrollPane = new JScrollPane(recordsListPanel);
-        scrollPane.setBackground(new Color(20, 20, 30));
-        scrollPane.getViewport().setBackground(new Color(20, 20, 30));
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(0, 40, 0, 40));
-        add(scrollPane, BorderLayout.CENTER);
+        JScrollPane scroll = new JScrollPane(listPanel);
+        scroll.setBackground(new Color(12, 12, 20));
+        scroll.getViewport().setBackground(new Color(12, 12, 20));
+        scroll.setBorder(BorderFactory.createEmptyBorder());
+        add(scroll, BorderLayout.CENTER);
 
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setBackground(new Color(20, 20, 30));
-        backButton = new JButton("Back to Menu");
-        backButton.setFont(new Font("Arial", Font.BOLD, 16));
-        backButton.setForeground(Color.WHITE);
-        backButton.setBackground(new Color(60, 60, 80));
-        backButton.setFocusPainted(false);
-        backButton.setBorderPainted(false);
-        backButton.setPreferredSize(new Dimension(200, 50));
-        backButton.addActionListener(new ActionListener() {
+        JPanel bottom = new JPanel();
+        bottom.setBackground(new Color(12, 12, 20));
+        bottom.setBorder(BorderFactory.createEmptyBorder(10, 0, 26, 0));
+
+        JButton back = new JButton("Back to Menu");
+        back.setFont(new Font("Arial", Font.BOLD, 16));
+        back.setForeground(Color.WHITE);
+        back.setBackground(new Color(55, 55, 80));
+        back.setFocusPainted(false);
+        back.setBorderPainted(false);
+        back.setPreferredSize(new Dimension(200, 50));
+        back.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainFrame.getInstance().showPanel("menu");
             }
         });
-        bottomPanel.add(backButton);
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
-        add(bottomPanel, BorderLayout.SOUTH);
+
+        bottom.add(back);
+        add(bottom, BorderLayout.SOUTH);
     }
 
-    public void refreshRecords() {
-        recordsListPanel.removeAll();
+    public void refresh() {
+        listPanel.removeAll();
 
-        JPanel headerRow = createRow("Player 1", "Player 2", "Winner", "Date", true);
-        recordsListPanel.add(headerRow);
-        recordsListPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        listPanel.add(buildRow("Player 1", "Player 2", "Winner", "Date", true));
+        listPanel.add(Box.createRigidArea(new Dimension(0, 4)));
 
-        List<GameRecord> records = databaseController.loadRecords();
+        List<GameRecord> records = dbController.loadRecords();
 
         if (records.isEmpty()) {
-            JLabel noRecords = new JLabel("No records yet.");
-            noRecords.setForeground(new Color(150, 150, 150));
-            noRecords.setFont(new Font("Arial", Font.ITALIC, 16));
-            noRecords.setAlignmentX(Component.CENTER_ALIGNMENT);
-            recordsListPanel.add(noRecords);
+            JLabel empty = new JLabel("No records yet.");
+            empty.setForeground(new Color(110, 110, 110));
+            empty.setFont(new Font("Arial", Font.ITALIC, 15));
+            empty.setAlignmentX(Component.CENTER_ALIGNMENT);
+            listPanel.add(Box.createRigidArea(new Dimension(0, 22)));
+            listPanel.add(empty);
         }
 
-        for (GameRecord record : records) {
-            JPanel row = createRow(
-                    record.getPlayer1Name(),
-                    record.getPlayer2Name(),
-                    record.getWinnerName(),
-                    record.getDate(),
-                    false
-            );
-            recordsListPanel.add(row);
-            recordsListPanel.add(Box.createRigidArea(new Dimension(0, 3)));
+        for (GameRecord r : records) {
+            listPanel.add(buildRow(
+                    r.getPlayer1Name(), r.getPlayer2Name(),
+                    r.getWinnerName(),  r.getDate(), false));
+            listPanel.add(Box.createRigidArea(new Dimension(0, 3)));
         }
 
-        recordsListPanel.revalidate();
-        recordsListPanel.repaint();
+        listPanel.revalidate();
+        listPanel.repaint();
     }
 
-    private JPanel createRow(String p1, String p2, String winner, String date, boolean isHeader) {
+    private JPanel buildRow(String p1, String p2, String winner,
+                            String date, boolean header) {
         JPanel row = new JPanel(new GridLayout(1, 4, 10, 0));
-        row.setMaximumSize(new Dimension(800, 40));
-        row.setBackground(isHeader ? new Color(50, 50, 70) : new Color(35, 35, 50));
-        row.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        row.setMaximumSize(new Dimension(900, 44));
+        row.setBackground(header ? new Color(38, 38, 58) : new Color(22, 22, 34));
+        row.setBorder(BorderFactory.createEmptyBorder(7, 14, 7, 14));
 
-        int style = isHeader ? Font.BOLD : Font.PLAIN;
-        Color color = isHeader ? Color.YELLOW : Color.WHITE;
+        int   style  = header ? Font.BOLD  : Font.PLAIN;
+        Color defCol = header ? Color.YELLOW : Color.WHITE;
+        Color winCol = header ? Color.YELLOW : new Color(80, 220, 100);
+        Color datCol = header ? Color.YELLOW : new Color(155, 155, 155);
 
-        row.add(makeRowLabel(p1, style, color));
-        row.add(makeRowLabel(p2, style, color));
-        row.add(makeRowLabel(winner, style, isHeader ? Color.YELLOW : new Color(100, 255, 100)));
-        row.add(makeRowLabel(date, style, isHeader ? Color.YELLOW : new Color(180, 180, 180)));
+        row.add(rowLabel(p1,     style, defCol));
+        row.add(rowLabel(p2,     style, defCol));
+        row.add(rowLabel(winner, style, winCol));
+        row.add(rowLabel(date,   style, datCol));
 
         return row;
     }
 
-    private JLabel makeRowLabel(String text, int style, Color color) {
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
-        label.setFont(new Font("Arial", style, 14));
-        label.setForeground(color);
-        return label;
+    private JLabel rowLabel(String text, int style, Color color) {
+        JLabel lbl = new JLabel(text, SwingConstants.CENTER);
+        lbl.setFont(new Font("Arial", style, 14));
+        lbl.setForeground(color);
+        return lbl;
     }
 }

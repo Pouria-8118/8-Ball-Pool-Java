@@ -10,9 +10,11 @@ import java.util.List;
 
 public class PhysicsEngine {
 
-    private static final int    SUBSTEPS            = 6;
-    private static final double FRICTION_PER_FRAME  = 0.965;
-    private static final double STOP_SPEED          = 0.15;
+    private static final int    SUBSTEPS           = 6;
+    private static final double FRICTION_PER_FRAME = 0.982;
+    private static final double STOP_SPEED         = 0.11;
+    private static final double POCKET_PULL_RADIUS = Pocket.RADIUS * 0.7;
+    private static final double POCKET_ANIM_SPEED  = 0.06;
 
     private CollisionHandler collisionHandler;
     private List<Ball>       pocketedThisTurn;
@@ -43,11 +45,12 @@ public class PhysicsEngine {
 
         for (int step = 0; step < SUBSTEPS; step++) {
             applyFrictionAndMove(state.getBalls(), frictionPerSubstep);
-            resolveAllWallCollisions(state.getBalls(), state);
-            resolveAllBallCollisions(state.getBalls());
-            checkPockets(state.getBalls(), state.getTable().getPockets());
+            resolveWalls(state.getBalls(), state);
+            resolveBallCollisions(state.getBalls());
         }
 
+        checkPockets(state.getBalls(), state.getTable().getPockets());
+        updatePocketAnimations(state.getBalls());
         applySpinEffect(state.getCueBall(), state.getSelectedSpin());
     }
 
@@ -57,13 +60,9 @@ public class PhysicsEngine {
                 continue;
             }
 
-            ball.setVelocityX(ball.getVelocityX() * friction);
-            ball.setVelocityY(ball.getVelocityY() * friction);
-
-            double speed = Math.sqrt(
-                ball.getVelocityX() * ball.getVelocityX() +
-                ball.getVelocityY() * ball.getVelocityY()
-            );
+            double newVx = ball.getVelocityX() * friction;
+            double newVy = ball.getVelocityY() * friction;
+            double speed = Math.sqrt(newVx * newVx + newVy * newVy);
 
             if (speed < STOP_SPEED) {
                 ball.setVelocityX(0);
@@ -71,12 +70,14 @@ public class PhysicsEngine {
                 continue;
             }
 
-            ball.setX(ball.getX() + ball.getVelocityX() / SUBSTEPS);
-            ball.setY(ball.getY() + ball.getVelocityY() / SUBSTEPS);
+            ball.setVelocityX(newVx);
+            ball.setVelocityY(newVy);
+            ball.setX(ball.getX() + newVx / SUBSTEPS);
+            ball.setY(ball.getY() + newVy / SUBSTEPS);
         }
     }
 
-    private void resolveAllWallCollisions(List<Ball> balls, GameState state) {
+    private void resolveWalls(List<Ball> balls, GameState state) {
         for (Ball ball : balls) {
             if (ball.isPocketed()) {
                 continue;
@@ -88,9 +89,9 @@ public class PhysicsEngine {
             collisionHandler.handleWallCollision(ball, state.getTable());
 
             boolean xFlipped = (prevVx > 0.1 && ball.getVelocityX() < 0)
-                             || (prevVx < -0.1 && ball.getVelocityX() > 0);
+                    || (prevVx < -0.1 && ball.getVelocityX() > 0);
             boolean yFlipped = (prevVy > 0.1 && ball.getVelocityY() < 0)
-                             || (prevVy < -0.1 && ball.getVelocityY() > 0);
+                    || (prevVy < -0.1 && ball.getVelocityY() > 0);
 
             if (xFlipped || yFlipped) {
                 wallHitsThisTurn++;
@@ -98,7 +99,7 @@ public class PhysicsEngine {
         }
     }
 
-    private void resolveAllBallCollisions(List<Ball> balls) {
+    private void resolveBallCollisions(List<Ball> balls) {
         for (int i = 0; i < balls.size(); i++) {
             for (int j = i + 1; j < balls.size(); j++) {
                 Ball a = balls.get(i);
@@ -128,19 +129,50 @@ public class PhysicsEngine {
             if (ball.isPocketed()) {
                 continue;
             }
+
             for (Pocket pocket : pockets) {
-                if (collisionHandler.isBallInPocket(ball, pocket)) {
-                    ball.setPocketed(true);
-                    ball.setVelocityX(0);
-                    ball.setVelocityY(0);
-                    if (ball.isCueBall()) {
-                        cueBallPocketed = true;
-                    } else {
-                        if (!pocketedThisTurn.contains(ball)) {
-                            pocketedThisTurn.add(ball);
-                        }
-                    }
+                double dx   = ball.getX() - pocket.getX();
+                double dy   = ball.getY() - pocket.getY();
+                double dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < POCKET_PULL_RADIUS) {
+                    startPocketing(ball, pocket);
+                    break;
                 }
+
+                if (dist < Pocket.RADIUS * 1.6) {
+                    double pullStrength = 0.08;
+                    double angle        = Math.atan2(dy, dx);
+                    ball.setVelocityX(ball.getVelocityX() - Math.cos(angle) * pullStrength);
+                    ball.setVelocityY(ball.getVelocityY() - Math.sin(angle) * pullStrength);
+                }
+            }
+        }
+    }
+
+    private void startPocketing(Ball ball, Pocket pocket) {
+        ball.setVelocityX(0);
+        ball.setVelocityY(0);
+        ball.setPocketed(true);
+        ball.setPocketAnimScale(1.0);
+
+        if (ball.isCueBall()) {
+            cueBallPocketed = true;
+        } else {
+            if (!pocketedThisTurn.contains(ball)) {
+                pocketedThisTurn.add(ball);
+            }
+        }
+    }
+
+    private void updatePocketAnimations(List<Ball> balls) {
+        for (Ball ball : balls) {
+            if (!ball.isPocketed()) {
+                continue;
+            }
+            double scale = ball.getPocketAnimScale();
+            if (scale > 0) {
+                ball.setPocketAnimScale(Math.max(0, scale - POCKET_ANIM_SPEED));
             }
         }
     }
@@ -151,8 +183,8 @@ public class PhysicsEngine {
         }
 
         double speed = Math.sqrt(
-            cueBall.getVelocityX() * cueBall.getVelocityX() +
-            cueBall.getVelocityY() * cueBall.getVelocityY()
+                cueBall.getVelocityX() * cueBall.getVelocityX() +
+                cueBall.getVelocityY() * cueBall.getVelocityY()
         );
 
         if (speed < 0.5) {
@@ -163,13 +195,13 @@ public class PhysicsEngine {
         double ny = cueBall.getVelocityY() / speed;
 
         if (spin == SpinType.TOP) {
-            cueBall.setVelocityX(cueBall.getVelocityX() + nx * 0.05);
-            cueBall.setVelocityY(cueBall.getVelocityY() + ny * 0.05);
+            cueBall.setVelocityX(cueBall.getVelocityX() + nx * 0.04);
+            cueBall.setVelocityY(cueBall.getVelocityY() + ny * 0.04);
         }
 
         if (spin == SpinType.BACK) {
-            cueBall.setVelocityX(cueBall.getVelocityX() - nx * 0.08);
-            cueBall.setVelocityY(cueBall.getVelocityY() - ny * 0.08);
+            cueBall.setVelocityX(cueBall.getVelocityX() - nx * 0.07);
+            cueBall.setVelocityY(cueBall.getVelocityY() - ny * 0.07);
         }
     }
 

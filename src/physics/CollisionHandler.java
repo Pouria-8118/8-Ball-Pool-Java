@@ -6,11 +6,11 @@ import model.Table;
 
 public class CollisionHandler {
 
-    private static final double WALL_RESTITUTION = 0.45;
-    private static final double BALL_RESTITUTION = 0.92;
+    private static final double WALL_RESTITUTION = 0.55;
+    private static final double BALL_RESTITUTION = 0.97;
 
     public void handleWallCollision(Ball ball, Table table) {
-        int r = Ball.RADIUS;
+        int    r      = Ball.RADIUS;
         double left   = table.getLeftWall()   + r;
         double right  = table.getRightWall()  - r;
         double top    = table.getTopWall()    + r;
@@ -20,7 +20,7 @@ public class CollisionHandler {
             ball.setX(left);
             if (ball.getVelocityX() < 0) {
                 ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
-                ball.setVelocityY(ball.getVelocityY() * WALL_RESTITUTION);
+                ball.setVelocityY(ball.getVelocityY()  * WALL_RESTITUTION);
             }
         }
 
@@ -28,7 +28,7 @@ public class CollisionHandler {
             ball.setX(right);
             if (ball.getVelocityX() > 0) {
                 ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
-                ball.setVelocityY(ball.getVelocityY() * WALL_RESTITUTION);
+                ball.setVelocityY(ball.getVelocityY()  * WALL_RESTITUTION);
             }
         }
 
@@ -36,7 +36,7 @@ public class CollisionHandler {
             ball.setY(top);
             if (ball.getVelocityY() < 0) {
                 ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
-                ball.setVelocityX(ball.getVelocityX() * WALL_RESTITUTION);
+                ball.setVelocityX(ball.getVelocityX()  * WALL_RESTITUTION);
             }
         }
 
@@ -44,7 +44,7 @@ public class CollisionHandler {
             ball.setY(bottom);
             if (ball.getVelocityY() > 0) {
                 ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
-                ball.setVelocityX(ball.getVelocityX() * WALL_RESTITUTION);
+                ball.setVelocityX(ball.getVelocityX()  * WALL_RESTITUTION);
             }
         }
     }
@@ -72,7 +72,7 @@ public class CollisionHandler {
 
         double overlap = Ball.RADIUS * 2.0 - dist;
         if (overlap > 0) {
-            double correction = overlap / 2.0 + 0.1;
+            double correction = overlap / 2.0 + 0.2;
             a.setX(a.getX() - nx * correction);
             a.setY(a.getY() - ny * correction);
             b.setX(b.getX() + nx * correction);
@@ -86,11 +86,10 @@ public class CollisionHandler {
             return;
         }
 
-        double aVtx = a.getVelocityX() - aVn * nx;
-        double aVty = a.getVelocityY() - aVn * ny;
-        double bVtx = b.getVelocityX() - bVn * nx;
-        double bVty = b.getVelocityY() - bVn * ny;
-
+        double aVtx  = a.getVelocityX() - aVn * nx;
+        double aVty  = a.getVelocityY() - aVn * ny;
+        double bVtx  = b.getVelocityX() - bVn * nx;
+        double bVty  = b.getVelocityY() - bVn * ny;
         double newAVn = bVn * BALL_RESTITUTION;
         double newBVn = aVn * BALL_RESTITUTION;
 
@@ -100,10 +99,10 @@ public class CollisionHandler {
         b.setVelocityY(bVty + newBVn * ny);
     }
 
-    public boolean isBallInPocket(Ball ball, Pocket pocket) {
+    public boolean isBallNearPocket(Ball ball, Pocket pocket) {
         double dx   = ball.getX() - pocket.getX();
         double dy   = ball.getY() - pocket.getY();
         double dist = Math.sqrt(dx * dx + dy * dy);
-        return dist < Pocket.RADIUS;
+        return dist < Pocket.RADIUS * 1.1;
     }
 }

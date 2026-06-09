@@ -1,142 +1,146 @@
 package view;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Properties;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 public class SettingsPanel extends JPanel {
 
-    private JTextField player1NameField;
-    private JTextField player2NameField;
-    private JCheckBox soundCheckBox;
-    private JButton saveButton;
-    private JButton backButton;
-
     private static final String SETTINGS_FILE = "settings.properties";
 
+    private JTextField p1Field;
+    private JTextField p2Field;
+    private JCheckBox  soundBox;
+
     public SettingsPanel() {
-        setBackground(new Color(30, 30, 40));
+        setBackground(new Color(16, 16, 26));
         setLayout(new BorderLayout());
-        initComponents();
+        buildUI();
         loadSettings();
     }
 
-    private void initComponents() {
+    private void buildUI() {
         JLabel title = new JLabel("Settings", SwingConstants.CENTER);
-        title.setFont(new Font("Arial", Font.BOLD, 32));
-        title.setForeground(Color.WHITE);
-        title.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
+        title.setFont(new Font("Georgia", Font.BOLD, 36));
+        title.setForeground(new Color(200, 170, 80));
+        title.setBorder(BorderFactory.createEmptyBorder(40, 0, 24, 0));
         add(title, BorderLayout.NORTH);
 
-        JPanel formPanel = new JPanel();
-        formPanel.setBackground(new Color(30, 30, 40));
-        formPanel.setLayout(new GridBagLayout());
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setBackground(new Color(16, 16, 26));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(12, 24, 12, 24);
+        gbc.fill   = GridBagConstraints.HORIZONTAL;
 
-        JLabel p1Label = makeLabel("Player 1 Name:");
-        player1NameField = makeTextField("Player 1");
+        p1Field  = styledField("Player 1");
+        p2Field  = styledField("Player 2");
+        soundBox = new JCheckBox("Enable Sound");
+        soundBox.setBackground(new Color(16, 16, 26));
+        soundBox.setForeground(Color.WHITE);
+        soundBox.setFont(new Font("Arial", Font.PLAIN, 15));
+        soundBox.setSelected(true);
 
-        JLabel p2Label = makeLabel("Player 2 Name:");
-        player2NameField = makeTextField("Player 2");
-
-        JLabel soundLabel = makeLabel("Sound:");
-        soundCheckBox = new JCheckBox("Enable");
-        soundCheckBox.setBackground(new Color(30, 30, 40));
-        soundCheckBox.setForeground(Color.WHITE);
-        soundCheckBox.setFont(new Font("Arial", Font.PLAIN, 16));
-        soundCheckBox.setSelected(true);
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        formPanel.add(p1Label, gbc);
+        gbc.gridx = 0; gbc.gridy = 0;
+        form.add(styledLabel("Player 1 Name:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(player1NameField, gbc);
+        form.add(p1Field, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(p2Label, gbc);
+        gbc.gridx = 0; gbc.gridy = 1;
+        form.add(styledLabel("Player 2 Name:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(player2NameField, gbc);
+        form.add(p2Field, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        formPanel.add(soundLabel, gbc);
+        gbc.gridx = 0; gbc.gridy = 2;
+        form.add(styledLabel("Sound:"), gbc);
         gbc.gridx = 1;
-        formPanel.add(soundCheckBox, gbc);
+        form.add(soundBox, gbc);
 
-        add(formPanel, BorderLayout.CENTER);
+        add(form, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setBackground(new Color(30, 30, 40));
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 20));
+        JPanel btns = new JPanel();
+        btns.setBackground(new Color(16, 16, 26));
+        btns.setBorder(BorderFactory.createEmptyBorder(0, 0, 34, 0));
 
-        saveButton = makeButton("Save Settings");
-        backButton = makeButton("Back to Menu");
+        JButton saveBtn = styledBtn("Save", new Color(45, 130, 65));
+        JButton backBtn = styledBtn("Back", new Color(55, 55, 75));
 
-        buttonPanel.add(saveButton);
-        buttonPanel.add(backButton);
-        add(buttonPanel, BorderLayout.SOUTH);
-
-        saveButton.addActionListener(new ActionListener() {
+        saveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveSettings();
-                JOptionPane.showMessageDialog(SettingsPanel.this, "Settings saved!");
+                JOptionPane.showMessageDialog(SettingsPanel.this, "Settings saved.");
             }
         });
 
-        backButton.addActionListener(new ActionListener() {
+        backBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainFrame.getInstance().showPanel("menu");
             }
         });
+
+        btns.add(saveBtn);
+        btns.add(backBtn);
+        add(btns, BorderLayout.SOUTH);
     }
 
-    private JLabel makeLabel(String text) {
-        JLabel label = new JLabel(text);
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("Arial", Font.PLAIN, 16));
-        return label;
+    private JLabel styledLabel(String text) {
+        JLabel lbl = new JLabel(text);
+        lbl.setForeground(Color.WHITE);
+        lbl.setFont(new Font("Arial", Font.PLAIN, 16));
+        return lbl;
     }
 
-    private JTextField makeTextField(String defaultText) {
-        JTextField field = new JTextField(defaultText, 20);
-        field.setFont(new Font("Arial", Font.PLAIN, 16));
-        field.setBackground(new Color(50, 50, 60));
+    private JTextField styledField(String def) {
+        JTextField field = new JTextField(def, 18);
+        field.setFont(new Font("Arial", Font.PLAIN, 15));
+        field.setBackground(new Color(38, 38, 52));
         field.setForeground(Color.WHITE);
         field.setCaretColor(Color.WHITE);
         field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 100, 100)),
-                BorderFactory.createEmptyBorder(5, 8, 5, 8)
-        ));
+                BorderFactory.createLineBorder(new Color(75, 75, 105)),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
         return field;
     }
 
-    private JButton makeButton(String text) {
+    private JButton styledBtn(String text, Color base) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Arial", Font.BOLD, 16));
         btn.setForeground(Color.WHITE);
-        btn.setBackground(new Color(60, 60, 80));
+        btn.setBackground(base);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
-        btn.setPreferredSize(new Dimension(200, 50));
+        btn.setPreferredSize(new Dimension(160, 50));
         return btn;
     }
 
     private void saveSettings() {
         Properties props = new Properties();
-        props.setProperty("player1Name", player1NameField.getText());
-        props.setProperty("player2Name", player2NameField.getText());
-        props.setProperty("soundEnabled", String.valueOf(soundCheckBox.isSelected()));
+        props.setProperty("player1Name", p1Field.getText().trim());
+        props.setProperty("player2Name", p2Field.getText().trim());
+        props.setProperty("soundEnabled", String.valueOf(soundBox.isSelected()));
         try {
             FileOutputStream fos = new FileOutputStream(SETTINGS_FILE);
-            props.store(fos, "Game Settings");
+            props.store(fos, "Settings");
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -157,15 +161,19 @@ public class SettingsPanel extends JPanel {
             e.printStackTrace();
             return;
         }
-        player1NameField.setText(props.getProperty("player1Name", "Player 1"));
-        player2NameField.setText(props.getProperty("player2Name", "Player 2"));
-        soundCheckBox.setSelected(Boolean.parseBoolean(props.getProperty("soundEnabled", "true")));
+        p1Field.setText(props.getProperty("player1Name", "Player 1"));
+        p2Field.setText(props.getProperty("player2Name", "Player 2"));
+        soundBox.setSelected(Boolean.parseBoolean(
+                props.getProperty("soundEnabled", "true")));
     }
 
     public String getPlayer1Name() {
-        return player1NameField.getText();
+        String name = p1Field.getText().trim();
+        return name.isEmpty() ? "Player 1" : name;
     }
+
     public String getPlayer2Name() {
-        return player2NameField.getText();
+        String name = p2Field.getText().trim();
+        return name.isEmpty() ? "Player 2" : name;
     }
 }

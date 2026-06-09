@@ -8,44 +8,51 @@ public class Player {
         STRIPE
     }
 
-    private String name;
-    private Group group;
-    private int score;
-    private boolean hasBallInHand;
+    private String  name;
+    private Group   group;
+    private int     score;
+    private boolean ballInHand;
 
     public Player(String name) {
-        this.name = name;
-        this.group = Group.NONE;
-        this.score = 0;
-        this.hasBallInHand = false;
+        this.name       = name;
+        this.group      = Group.NONE;
+        this.score      = 0;
+        this.ballInHand = false;
     }
 
-    public String getName() { 
+    public void incrementScore() {
+        this.score++;
+    }
+
+    public String getName() {
         return name;
     }
+
     public Group getGroup() {
         return group;
     }
+
     public int getScore() {
         return score;
     }
-    public boolean hasBallInHand() { 
-        return hasBallInHand;
+
+    public boolean hasBallInHand() {
+        return ballInHand;
     }
 
     public void setName(String name) {
         this.name = name;
     }
+
     public void setGroup(Group group) {
         this.group = group;
     }
-    public void setScore(int score) { 
+
+    public void setScore(int score) {
         this.score = score;
     }
+
     public void setBallInHand(boolean ballInHand) {
-        this.hasBallInHand = ballInHand; 
-    }
-    public void incrementScore() { 
-        this.score++; 
+        this.ballInHand = ballInHand;
     }
 }

@@ -2,22 +2,27 @@ package view;
 
 import controller.GameController;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 public class MainFrame extends JFrame {
 
     private static MainFrame instance;
-    private CardLayout cardLayout;
-    private JPanel mainPanel;
-    private GamePanel gamePanel;
+
+    private CardLayout    cardLayout;
+    private JPanel        mainPanel;
+    private GamePanel     gamePanel;
     private SettingsPanel settingsPanel;
-    private RecordsPanel recordsPanel;
+    private RecordsPanel  recordsPanel;
 
     private MainFrame() {
-        initializeFrame();
-        setupMainPanel();
-        addPanels();
+        setTitle("8-Ball Billiard");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        buildPanels();
     }
 
     public static MainFrame getInstance() {
@@ -27,28 +32,15 @@ public class MainFrame extends JFrame {
         return instance;
     }
 
-    private void initializeFrame() {
-        setTitle("8-Ball Billiard Game");
-        setSize(960, 620);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setResizable(false);
-    }
-
-    private void setupMainPanel() {
+    private void buildPanels() {
         cardLayout = new CardLayout();
-        mainPanel = new JPanel(cardLayout);
-        mainPanel.setBackground(Color.DARK_GRAY);
+        mainPanel  = new JPanel(cardLayout);
+        mainPanel.setBackground(Color.BLACK);
         add(mainPanel);
-    }
 
-    private void addPanels() {
-        MainMenuPanel menuPanel = new MainMenuPanel();
-        mainPanel.add(menuPanel, "menu");
+        mainPanel.add(new MainMenuPanel(), "menu");
 
         gamePanel = new GamePanel();
-        GameController gameController = new GameController(gamePanel);
-        gamePanel.setGameController(gameController);
         mainPanel.add(gamePanel, "game");
 
         settingsPanel = new SettingsPanel();
@@ -58,24 +50,22 @@ public class MainFrame extends JFrame {
         mainPanel.add(recordsPanel, "records");
 
         cardLayout.show(mainPanel, "menu");
+        setSize(960, 630);
+        setMinimumSize(new Dimension(960, 630));
+        setLocationRelativeTo(null);
     }
 
-    public void showPanel(String panelName) {
-        if (panelName.equals("game")) {
-            SettingsPanel sp = (SettingsPanel) getSettingsPanel();
-            String p1 = sp.getPlayer1Name();
-            String p2 = sp.getPlayer2Name();
-            GameController controller = new GameController(gamePanel);
-            gamePanel.setGameController(controller);
-            controller.startNewGame(p1, p2);
+    public void showPanel(String name) {
+        if (name.equals("game")) {
+            String p1         = settingsPanel.getPlayer1Name();
+            String p2         = settingsPanel.getPlayer2Name();
+            GameController gc = new GameController(gamePanel);
+            gamePanel.setGameController(gc);
+            gc.startNewGame(p1, p2);
         }
-        if (panelName.equals("records")) {
-            recordsPanel.refreshRecords();
+        if (name.equals("records")) {
+            recordsPanel.refresh();
         }
-        cardLayout.show(mainPanel, panelName);
-    }
-
-    private SettingsPanel getSettingsPanel() {
-        return settingsPanel;
+        cardLayout.show(mainPanel, name);
     }
 }

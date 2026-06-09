@@ -6,62 +6,103 @@ public class Ball {
 
     public static final int RADIUS = 14;
 
-    private int    number;
-    private double x;
-    private double y;
-    private double velocityX;
-    private double velocityY;
-    private Color  color;
-    private boolean isStripe;
-    private boolean isCueBall;
-    private boolean isBlack;
-    private boolean isPocketed;
+    private int     number;
+    private double  x;
+    private double  y;
+    private double  velocityX;
+    private double  velocityY;
+    private Color   color;
+    private boolean stripe;
+    private boolean cueBall;
+    private boolean black;
+    private boolean pocketed;
+    private double  pocketAnimScale;
 
     public Ball(int number, double x, double y, Color color,
-                boolean isStripe, boolean isCueBall, boolean isBlack) {
-        this.number    = number;
-        this.x         = x;
-        this.y         = y;
-        this.color     = color;
-        this.isStripe  = isStripe;
-        this.isCueBall = isCueBall;
-        this.isBlack   = isBlack;
-        this.velocityX = 0;
-        this.velocityY = 0;
-        this.isPocketed = false;
+                boolean stripe, boolean cueBall, boolean black) {
+        this.number          = number;
+        this.x               = x;
+        this.y               = y;
+        this.color           = color;
+        this.stripe          = stripe;
+        this.cueBall         = cueBall;
+        this.black           = black;
+        this.velocityX       = 0;
+        this.velocityY       = 0;
+        this.pocketed        = false;
+        this.pocketAnimScale = 1.0;
     }
 
     public boolean isMoving() {
         double speed = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
-        return speed > 0.12;
+        return speed > 0.10;
     }
 
-    public void applyFriction(double friction) {
-        velocityX *= friction;
-        velocityY *= friction;
+    public int getNumber() {
+        return number;
     }
 
-    public void update() {
-        if (!isPocketed) {
-            x += velocityX;
-            y += velocityY;
-        }
+    public double getX() {
+        return x;
     }
 
-    public int     getNumber()    { return number;    }
-    public double  getX()         { return x;         }
-    public double  getY()         { return y;         }
-    public double  getVelocityX() { return velocityX; }
-    public double  getVelocityY() { return velocityY; }
-    public Color   getColor()     { return color;     }
-    public boolean isStripe()     { return isStripe;  }
-    public boolean isCueBall()    { return isCueBall; }
-    public boolean isBlack()      { return isBlack;   }
-    public boolean isPocketed()   { return isPocketed; }
+    public double getY() {
+        return y;
+    }
 
-    public void setX(double x)              { this.x = x;               }
-    public void setY(double y)              { this.y = y;               }
-    public void setVelocityX(double vx)     { this.velocityX = vx;      }
-    public void setVelocityY(double vy)     { this.velocityY = vy;      }
-    public void setPocketed(boolean val)    { this.isPocketed = val;    }
+    public double getVelocityX() {
+        return velocityX;
+    }
+
+    public double getVelocityY() {
+        return velocityY;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public boolean isStripe() {
+        return stripe;
+    }
+
+    public boolean isCueBall() {
+        return cueBall;
+    }
+
+    public boolean isBlack() {
+        return black;
+    }
+
+    public boolean isPocketed() {
+        return pocketed;
+    }
+
+    public double getPocketAnimScale() {
+        return pocketAnimScale;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public void setVelocityX(double vx) {
+        this.velocityX = vx;
+    }
+
+    public void setVelocityY(double vy) {
+        this.velocityY = vy;
+    }
+
+    public void setPocketed(boolean pocketed) {
+        this.pocketed = pocketed;
+    }
+
+    public void setPocketAnimScale(double scale) {
+        this.pocketAnimScale = scale;
+    }
 }
