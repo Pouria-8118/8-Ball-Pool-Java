@@ -307,7 +307,9 @@ public class GameController {
             assignGroups(current, opponent, pocketed);
         }
 
+        boolean scoredInSelectedPocket = checkPocketMatch(pocketed);
         boolean scoredOwn = false;
+        
         for (Ball b : pocketed) {
             if (b.isBlack()) {
                 continue;
@@ -324,14 +326,33 @@ public class GameController {
         gameState.setSelectedPocket(null);
         gameState.setSelectedSpin(SpinType.NONE);
 
-        if (scoredOwn) {
+        if (scoredOwn && scoredInSelectedPocket) {
             Color c = (current == gameState.getPlayer1())
                     ? PlayerInfoPanel.PLAYER1_COLOR : PlayerInfoPanel.PLAYER2_COLOR;
             gamePanel.showAnnouncement(current.getName() + " scored!", c);
             gameState.setPhase(GameState.Phase.SELECT_POCKET);
+        } else if (scoredOwn && !scoredInSelectedPocket) {
+            switchTurn("Wrong pocket! Turn over.", opponent);
         } else {
             switchTurn("Turn over!", opponent);
         }
+    }
+
+    private boolean checkPocketMatch(List<Ball> pocketed) {
+        Pocket selected = gameState.getSelectedPocket();
+        if (selected == null || pocketed.isEmpty()) {
+            return false;
+        }
+        
+        for (Ball ball : pocketed) {
+            Pocket closest = findClosestPocket(ball);
+            double dx = selected.getX() - closest.getX();
+            double dy = selected.getY() - closest.getY();
+            if (Math.sqrt(dx * dx + dy * dy) < 40) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void handleBreak(List<Ball> pocketed, boolean cuePocketed,

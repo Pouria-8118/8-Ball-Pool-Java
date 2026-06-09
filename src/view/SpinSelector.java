@@ -53,82 +53,86 @@ public class SpinSelector {
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int boxW = 280;
-        int boxH = 240;
+        int boxW = 300;
+        int boxH = 250;
         int bx   = centerX - boxW / 2;
         int by   = centerY - boxH / 2;
 
-        g.setColor(new Color(15, 15, 15, 220));
-        g.fillRoundRect(bx, by, boxW, boxH, 18, 18);
-        g.setColor(new Color(90, 90, 90));
+        g.setColor(new Color(30, 30, 40, 250));
+        g.fillRoundRect(bx, by, boxW, boxH, 20, 20);
+        g.setColor(new Color(80, 80, 100));
         g.setStroke(new BasicStroke(1.5f));
-        g.drawRoundRect(bx, by, boxW, boxH, 18, 18);
+        g.drawRoundRect(bx, by, boxW, boxH, 20, 20);
         g.setStroke(new BasicStroke(1));
 
-        g.setColor(new Color(200, 200, 200));
-        g.setFont(new Font("Arial", Font.BOLD, 15));
-        FontMetrics fm    = g.getFontMetrics();
-        String      title = "Choose Spin Point";
-        g.drawString(title, centerX - fm.stringWidth(title) / 2, by + 26);
+        g.setColor(new Color(220, 200, 120));
+        g.setFont(new Font("Arial", Font.BOLD, 17));
+        FontMetrics fm = g.getFontMetrics();
+        String title = "Select Spin Type";
+        g.drawString(title, centerX - fm.stringWidth(title) / 2, by + 30);
 
-        g.setColor(new Color(230, 230, 230));
+        g.setColor(new Color(220, 220, 220));
         g.fillOval(centerX - BALL_R, centerY - BALL_R + 20, BALL_R * 2, BALL_R * 2);
-        g.setColor(new Color(180, 180, 180));
+        g.setColor(new Color(60, 60, 80));
         g.setStroke(new BasicStroke(1.5f));
         g.drawOval(centerX - BALL_R, centerY - BALL_R + 20, BALL_R * 2, BALL_R * 2);
         g.setStroke(new BasicStroke(1));
 
-        g.setColor(new Color(255, 255, 255, 70));
-        g.fillOval(centerX - BALL_R + 8, centerY - BALL_R + 22, BALL_R / 2, BALL_R / 3);
-
         int ballCY = centerY + 20;
 
-        drawDot(g, centerX,          ballCY - BALL_R / 2, SpinType.TOP,  "Top spin");
-        drawDot(g, centerX,          ballCY + BALL_R / 2, SpinType.BACK, "Back spin");
-        drawDot(g, centerX,          ballCY,              SpinType.NONE, "Stop");
+        drawDot(g, centerX, ballCY - BALL_R / 2, SpinType.TOP, "TOP SPIN");
+        drawDot(g, centerX, ballCY + BALL_R / 2, SpinType.BACK, "BACK SPIN");
+        drawDot(g, centerX, ballCY, SpinType.NONE, "STOP");
 
-        g.setColor(new Color(120, 120, 120));
+        g.setColor(new Color(150, 150, 170));
         g.setFont(new Font("Arial", Font.PLAIN, 11));
-        FontMetrics hfm  = g.getFontMetrics();
-        String      hint = "Click to select";
-        g.drawString(hint, centerX - hfm.stringWidth(hint) / 2, by + boxH - 10);
+        FontMetrics hfm = g.getFontMetrics();
+        String hint = "Click to select";
+        g.drawString(hint, centerX - hfm.stringWidth(hint) / 2, by + boxH - 12);
     }
 
-    private void drawDot(Graphics2D g, int dotX, int dotY,
-                          SpinType spin, String label) {
-        boolean isHovered  = spin == hovered;
+    private void drawDot(Graphics2D g, int dotX, int dotY, SpinType spin, String label) {
+        boolean isHovered = spin == hovered;
         boolean isSelected = spin == selected;
 
         Color fill;
         if (isSelected) {
-            fill = new Color(255, 50, 50);
+            fill = new Color(60, 180, 60);
         } else if (isHovered) {
-            fill = new Color(255, 160, 40);
+            fill = new Color(220, 80, 80);
         } else {
-            fill = new Color(200, 50, 50, 200);
-        }
-
-        if (isSelected || isHovered) {
-            g.setColor(new Color(255, 255, 255, 60));
-            g.fillOval(dotX - DOT_R - 4, dotY - DOT_R - 4,
-                       (DOT_R + 4) * 2, (DOT_R + 4) * 2);
+            fill = new Color(100, 100, 120);
         }
 
         g.setColor(fill);
         g.fillOval(dotX - DOT_R, dotY - DOT_R, DOT_R * 2, DOT_R * 2);
 
+        if (isSelected || isHovered) {
+            g.setColor(new Color(255, 255, 255, 80));
+            g.setStroke(new BasicStroke(2.0f));
+            g.drawOval(dotX - DOT_R - 2, dotY - DOT_R - 2, (DOT_R + 2) * 2, (DOT_R + 2) * 2);
+            g.setStroke(new BasicStroke(1));
+        }
+
         if (isSelected) {
             g.setColor(Color.WHITE);
-            g.setStroke(new BasicStroke(1.8f));
+            g.setStroke(new BasicStroke(1.5f));
             g.drawOval(dotX - DOT_R, dotY - DOT_R, DOT_R * 2, DOT_R * 2);
             g.setStroke(new BasicStroke(1));
         }
 
-        g.setFont(new Font("Arial", isSelected ? Font.BOLD : Font.PLAIN, 11));
-        FontMetrics fm   = g.getFontMetrics();
-        Color       lblC = isSelected ? Color.YELLOW : new Color(200, 200, 200);
-        g.setColor(lblC);
-        g.drawString(label, dotX + DOT_R + 6, dotY + fm.getAscent() / 2 - 1);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        FontMetrics fm = g.getFontMetrics();
+        
+        if (isSelected) {
+            g.setColor(new Color(100, 220, 100));
+        } else if (isHovered) {
+            g.setColor(new Color(255, 120, 120));
+        } else {
+            g.setColor(new Color(180, 180, 200));
+        }
+        
+        g.drawString(label, dotX + DOT_R + 10, dotY + fm.getAscent() / 2);
     }
 
     public SpinType handleClick(MouseEvent e) {
@@ -136,8 +140,8 @@ public class SpinSelector {
             return null;
         }
 
-        int    ballCY  = centerY + 20;
-        int[]  ys      = {ballCY - BALL_R / 2, ballCY + BALL_R / 2, ballCY};
+        int ballCY = centerY + 20;
+        int[] ys = {ballCY - BALL_R / 2, ballCY + BALL_R / 2, ballCY};
         SpinType[] spins = {SpinType.TOP, SpinType.BACK, SpinType.NONE};
 
         for (int i = 0; i < spins.length; i++) {
@@ -157,8 +161,8 @@ public class SpinSelector {
             return;
         }
 
-        int    ballCY  = centerY + 20;
-        int[]  ys      = {ballCY - BALL_R / 2, ballCY + BALL_R / 2, ballCY};
+        int ballCY = centerY + 20;
+        int[] ys = {ballCY - BALL_R / 2, ballCY + BALL_R / 2, ballCY};
         SpinType[] spins = {SpinType.TOP, SpinType.BACK, SpinType.NONE};
 
         hovered = null;
