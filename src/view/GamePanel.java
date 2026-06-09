@@ -371,8 +371,8 @@ public class GamePanel extends JPanel {
         int cx  = (int) cue.getX();
         int cy  = (int) cue.getY();
         int len = 170;
-        int ex  = (int)(cx + Math.cos(aimAngle) * len);
-        int ey  = (int)(cy + Math.sin(aimAngle) * len);
+        int ex  = (int)(cx - Math.cos(aimAngle) * len);
+        int ey  = (int)(cy - Math.sin(aimAngle) * len);
 
         g.setColor(new Color(255, 255, 255, 60));
         g.setStroke(new BasicStroke(1.3f,

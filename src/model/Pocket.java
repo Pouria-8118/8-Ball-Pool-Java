@@ -2,7 +2,7 @@ package model;
 
 public class Pocket {
 
-    public static final int RADIUS = 20;
+    public static final int RADIUS = 22;
 
     private double x;
     private double y;

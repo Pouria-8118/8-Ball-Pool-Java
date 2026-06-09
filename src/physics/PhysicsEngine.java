@@ -13,7 +13,7 @@ public class PhysicsEngine {
     private static final int    SUBSTEPS           = 6;
     private static final double FRICTION_PER_FRAME = 0.982;
     private static final double STOP_SPEED         = 0.11;
-    private static final double POCKET_PULL_RADIUS = Pocket.RADIUS * 0.7;
+    private static final double POCKET_PULL_RADIUS = Pocket.RADIUS * 1.2;
     private static final double POCKET_ANIM_SPEED  = 0.06;
 
     private CollisionHandler collisionHandler;
@@ -140,7 +140,7 @@ public class PhysicsEngine {
                     break;
                 }
 
-                if (dist < Pocket.RADIUS * 1.6) {
+                if (dist < Pocket.RADIUS * 1.8) {
                     double pullStrength = 0.08;
                     double angle        = Math.atan2(dy, dx);
                     ball.setVelocityX(ball.getVelocityX() - Math.cos(angle) * pullStrength);
