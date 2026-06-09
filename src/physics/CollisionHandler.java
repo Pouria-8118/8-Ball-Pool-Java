@@ -10,99 +10,111 @@ public class CollisionHandler {
     private static final double BALL_RESTITUTION = 0.97;
 
     public void handleWallCollision(Ball ball, Table table) {
-        int    r      = Ball.RADIUS;
-        double left   = table.getLeftWall()   + r;
-        double right  = table.getRightWall()  - r;
-        double top    = table.getTopWall()    + r;
+        int r = Ball.RADIUS;
+        double left = table.getLeftWall() + r;
+        double right = table.getRightWall() - r;
+        double top = table.getTopWall() + r;
         double bottom = table.getBottomWall() - r;
 
-        if (ball.getX() < left) {
-            ball.setX(left);
-            if (ball.getVelocityX() < 0) {
-                ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
-                ball.setVelocityY(ball.getVelocityY()  * WALL_RESTITUTION);
+        Vector pos = new Vector(ball.getX(), ball.getY());
+        Vector vel = new Vector(ball.getVelocityX(), ball.getVelocityY());
+
+        if (pos.getX() < left) {
+            pos = new Vector(left, pos.getY());
+            if (vel.getX() < 0) {
+                vel = new Vector(-vel.getX() * WALL_RESTITUTION, vel.getY() * WALL_RESTITUTION);
             }
         }
 
-        if (ball.getX() > right) {
-            ball.setX(right);
-            if (ball.getVelocityX() > 0) {
-                ball.setVelocityX(-ball.getVelocityX() * WALL_RESTITUTION);
-                ball.setVelocityY(ball.getVelocityY()  * WALL_RESTITUTION);
+        if (pos.getX() > right) {
+            pos = new Vector(right, pos.getY());
+            if (vel.getX() > 0) {
+                vel = new Vector(-vel.getX() * WALL_RESTITUTION, vel.getY() * WALL_RESTITUTION);
             }
         }
 
-        if (ball.getY() < top) {
-            ball.setY(top);
-            if (ball.getVelocityY() < 0) {
-                ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
-                ball.setVelocityX(ball.getVelocityX()  * WALL_RESTITUTION);
+        if (pos.getY() < top) {
+            pos = new Vector(pos.getX(), top);
+            if (vel.getY() < 0) {
+                vel = new Vector(vel.getX() * WALL_RESTITUTION, -vel.getY() * WALL_RESTITUTION);
             }
         }
 
-        if (ball.getY() > bottom) {
-            ball.setY(bottom);
-            if (ball.getVelocityY() > 0) {
-                ball.setVelocityY(-ball.getVelocityY() * WALL_RESTITUTION);
-                ball.setVelocityX(ball.getVelocityX()  * WALL_RESTITUTION);
+        if (pos.getY() > bottom) {
+            pos = new Vector(pos.getX(), bottom);
+            if (vel.getY() > 0) {
+                vel = new Vector(vel.getX() * WALL_RESTITUTION, -vel.getY() * WALL_RESTITUTION);
             }
         }
+
+        ball.setX(pos.getX());
+        ball.setY(pos.getY());
+        ball.setVelocityX(vel.getX());
+        ball.setVelocityY(vel.getY());
     }
 
     public boolean areBallsOverlapping(Ball a, Ball b) {
-        double dx   = a.getX() - b.getX();
-        double dy   = a.getY() - b.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
+        Vector pa = new Vector(a.getX(), a.getY());
+        Vector pb = new Vector(b.getX(), b.getY());
+        Vector diff = pa.subtract(pb);
+        double dist = diff.length();
         return dist < Ball.RADIUS * 2.0;
     }
 
     public void resolveBallCollision(Ball a, Ball b) {
-        double dx   = b.getX() - a.getX();
-        double dy   = b.getY() - a.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
+        Vector pa = new Vector(a.getX(), a.getY());
+        Vector pb = new Vector(b.getX(), b.getY());
+        Vector va = new Vector(a.getVelocityX(), a.getVelocityY());
+        Vector vb = new Vector(b.getVelocityX(), b.getVelocityY());
+
+        Vector n = pb.subtract(pa);
+        double dist = n.length();
 
         if (dist < 0.0001) {
-            dist = 0.0001;
-            dx   = 1.0;
-            dy   = 0.0;
+            n = new Vector(1.0, 0.0);
+            dist = 1.0;
+        } else {
+            n = n.normalize();
         }
-
-        double nx = dx / dist;
-        double ny = dy / dist;
 
         double overlap = Ball.RADIUS * 2.0 - dist;
         if (overlap > 0) {
-            double correction = overlap / 2.0 + 0.2;
-            a.setX(a.getX() - nx * correction);
-            a.setY(a.getY() - ny * correction);
-            b.setX(b.getX() + nx * correction);
-            b.setY(b.getY() + ny * correction);
+            Vector correction = n.scale(overlap / 2.0 + 0.2);
+            pa = pa.subtract(correction);
+            pb = pb.add(correction);
+            a.setX(pa.getX());
+            a.setY(pa.getY());
+            b.setX(pb.getX());
+            b.setY(pb.getY());
         }
 
-        double aVn = a.getVelocityX() * nx + a.getVelocityY() * ny;
-        double bVn = b.getVelocityX() * nx + b.getVelocityY() * ny;
+        double va_n = va.dot(n);
+        double vb_n = vb.dot(n);
 
-        if (aVn - bVn <= 0) {
+        if (va_n - vb_n <= 0) {
             return;
         }
 
-        double aVtx  = a.getVelocityX() - aVn * nx;
-        double aVty  = a.getVelocityY() - aVn * ny;
-        double bVtx  = b.getVelocityX() - bVn * nx;
-        double bVty  = b.getVelocityY() - bVn * ny;
-        double newAVn = bVn * BALL_RESTITUTION;
-        double newBVn = aVn * BALL_RESTITUTION;
+        Vector va_t = va.subtract(n.scale(va_n));
+        Vector vb_t = vb.subtract(n.scale(vb_n));
 
-        a.setVelocityX(aVtx + newAVn * nx);
-        a.setVelocityY(aVty + newAVn * ny);
-        b.setVelocityX(bVtx + newBVn * nx);
-        b.setVelocityY(bVty + newBVn * ny);
+        double new_va_n = vb_n * BALL_RESTITUTION;
+        double new_vb_n = va_n * BALL_RESTITUTION;
+
+        Vector new_va = va_t.add(n.scale(new_va_n));
+        Vector new_vb = vb_t.add(n.scale(new_vb_n));
+
+        a.setVelocityX(new_va.getX());
+        a.setVelocityY(new_va.getY());
+        b.setVelocityX(new_vb.getX());
+        b.setVelocityY(new_vb.getY());
     }
 
     public boolean isBallNearPocket(Ball ball, Pocket pocket) {
-        double dx   = ball.getX() - pocket.getX();
-        double dy   = ball.getY() - pocket.getY();
-        double dist = Math.sqrt(dx * dx + dy * dy);
+        Vector ballPos = new Vector(ball.getX(), ball.getY());
+        Vector pocketPos = new Vector(pocket.getX(), pocket.getY());
+        Vector diff = ballPos.subtract(pocketPos);
+        double dist = diff.length();
         return dist < Pocket.RADIUS * 1.1;
     }
 }
