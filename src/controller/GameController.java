@@ -263,7 +263,7 @@ public class GameController {
             return;
         }
 
-        double angle = Math.atan2(dy, dx) + Math.PI;
+        double angle = Math.atan2(dy, dx);
 
         physicsEngine.resetTurnTracking();
         gamePanel.notifyShot();
