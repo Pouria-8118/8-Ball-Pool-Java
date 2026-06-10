@@ -2,7 +2,12 @@ package controller;
 
 import model.GameRecord;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +17,11 @@ public class DatabaseController {
 
     public void saveRecord(GameRecord record) {
         try {
-            FileWriter fw = new FileWriter(FILE_PATH, true);
+            FileWriter   fw = new FileWriter(FILE_PATH, true);
             BufferedWriter bw = new BufferedWriter(fw);
             String line = record.getPlayer1Name() + ","
                     + record.getPlayer2Name() + ","
-                    + record.getWinnerName() + ","
+                    + record.getWinnerName()  + ","
                     + record.getDate();
             bw.write(line);
             bw.newLine();
@@ -34,14 +39,13 @@ public class DatabaseController {
             return records;
         }
         try {
-            FileReader fr = new FileReader(file);
+            FileReader   fr = new FileReader(file);
             BufferedReader br = new BufferedReader(fr);
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length == 4) {
-                    GameRecord record = new GameRecord(parts[0], parts[1], parts[2], parts[3]);
-                    records.add(record);
+                    records.add(new GameRecord(parts[0], parts[1], parts[2], parts[3]));
                 }
             }
             br.close();
