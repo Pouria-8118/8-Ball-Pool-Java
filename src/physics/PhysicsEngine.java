@@ -159,7 +159,7 @@ public class PhysicsEngine {
                     break;
                 }
 
-                if (dist < Pocket.RADIUS * 1.7) {
+                if (dist < Pocket.RADIUS * 1.7 ) {
                     double pullStrength = 0.08;
                     Vector dir = diff.normalize();
                     Vector pull = dir.scale(pullStrength);

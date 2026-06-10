@@ -165,7 +165,7 @@ public class GameController {
         double dx    = mx - cue.getX();
         double dy    = my - cue.getY();
         double dist  = Math.sqrt(dx * dx + dy * dy);
-        double power = Math.min(dist / 16.0, MAX_POWER);
+        double power = Math.min(dist / 12.0, MAX_POWER);
         double angle = Math.atan2(dy, dx) + Math.PI;
 
         gamePanel.setAimAngle(angle);
