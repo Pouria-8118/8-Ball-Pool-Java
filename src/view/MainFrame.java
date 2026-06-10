@@ -65,8 +65,13 @@ public class MainFrame extends JFrame {
 
     public void showPanel(String name) {
         if (name.equals("game")) {
-            String p1         = settingsPanel.getPlayer1Name();
-            String p2         = settingsPanel.getPlayer2Name();
+            String p1 = settingsPanel.getPlayer1Name();
+            String p2 = settingsPanel.getPlayer2Name();
+            
+            float volume = settingsPanel.getMasterVolume() / 100.0f;
+            SoundManager.getInstance().setMasterVolume(volume);
+            SoundManager.getInstance().setEnabled(true);
+            
             GameController gc = new GameController(gamePanel);
             gamePanel.setGameController(gc);
             gamePanel.setCueTypes(p1CueType, p2CueType);

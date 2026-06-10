@@ -16,12 +16,14 @@ import java.io.IOException;
 import java.util.Properties;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class SettingsPanel extends JPanel {
 
@@ -29,7 +31,7 @@ public class SettingsPanel extends JPanel {
 
     private JTextField p1Field;
     private JTextField p2Field;
-    private JCheckBox  soundBox;
+    private JSlider    volumeSlider;
 
     public SettingsPanel() {
         setBackground(new Color(16, 16, 26));
@@ -53,11 +55,15 @@ public class SettingsPanel extends JPanel {
 
         p1Field  = styledField("Player 1");
         p2Field  = styledField("Player 2");
-        soundBox = new JCheckBox("Enable Sound");
-        soundBox.setBackground(new Color(16, 16, 26));
-        soundBox.setForeground(Color.WHITE);
-        soundBox.setFont(new Font("Arial", Font.PLAIN, 15));
-        soundBox.setSelected(true);
+        
+        volumeSlider = new JSlider(0, 100, 70);
+        volumeSlider.setBackground(new Color(16, 16, 26));
+        volumeSlider.setForeground(Color.WHITE);
+        volumeSlider.setMajorTickSpacing(25);
+        volumeSlider.setMinorTickSpacing(5);
+        volumeSlider.setPaintTicks(true);
+        volumeSlider.setPaintLabels(true);
+        volumeSlider.setFont(new Font("Arial", Font.PLAIN, 11));
 
         gbc.gridx = 0; gbc.gridy = 0;
         form.add(styledLabel("Player 1 Name:"), gbc);
@@ -70,12 +76,11 @@ public class SettingsPanel extends JPanel {
         form.add(p2Field, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
-        form.add(styledLabel("Sound:"), gbc);
+        form.add(styledLabel("Master Volume:"), gbc);
         gbc.gridx = 1;
-        form.add(soundBox, gbc);
-
-        add(form, BorderLayout.CENTER);
+        form.add(volumeSlider, gbc);
         
+        // اضافه شدن بخش انتخاب Cue Stick
         JButton cueBtn = styledBtn("Choose Cues", new Color(60, 80, 110));
         cueBtn.addActionListener(new ActionListener() {
             @Override
@@ -88,6 +93,10 @@ public class SettingsPanel extends JPanel {
         form.add(styledLabel("Cue Sticks:"), gbc);
         gbc.gridx = 1;
         form.add(cueBtn, gbc);
+        // اتمام بخش Cue Stick
+
+        add(form, BorderLayout.CENTER);
+
         JPanel btns = new JPanel();
         btns.setBackground(new Color(16, 16, 26));
         btns.setBorder(BorderFactory.createEmptyBorder(0, 0, 34, 0));
@@ -99,6 +108,7 @@ public class SettingsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 saveSettings();
+                applyVolume();
                 JOptionPane.showMessageDialog(SettingsPanel.this, "Settings saved.");
             }
         });
@@ -107,6 +117,13 @@ public class SettingsPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 MainFrame.getInstance().showPanel("menu");
+            }
+        });
+        
+        volumeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                applyVolume();
             }
         });
 
@@ -149,7 +166,7 @@ public class SettingsPanel extends JPanel {
         Properties props = new Properties();
         props.setProperty("player1Name", p1Field.getText().trim());
         props.setProperty("player2Name", p2Field.getText().trim());
-        props.setProperty("soundEnabled", String.valueOf(soundBox.isSelected()));
+        props.setProperty("masterVolume", String.valueOf(volumeSlider.getValue()));
         try {
             FileOutputStream fos = new FileOutputStream(SETTINGS_FILE);
             props.store(fos, "Settings");
@@ -162,6 +179,8 @@ public class SettingsPanel extends JPanel {
     private void loadSettings() {
         File file = new File(SETTINGS_FILE);
         if (!file.exists()) {
+            volumeSlider.setValue(70);
+            applyVolume();
             return;
         }
         Properties props = new Properties();
@@ -175,8 +194,15 @@ public class SettingsPanel extends JPanel {
         }
         p1Field.setText(props.getProperty("player1Name", "Player 1"));
         p2Field.setText(props.getProperty("player2Name", "Player 2"));
-        soundBox.setSelected(Boolean.parseBoolean(
-                props.getProperty("soundEnabled", "true")));
+        int volume = Integer.parseInt(props.getProperty("masterVolume", "70"));
+        volumeSlider.setValue(volume);
+        applyVolume();
+    }
+    
+    private void applyVolume() {
+        float volumePercent = volumeSlider.getValue() / 100.0f;
+        SoundManager.getInstance().setMasterVolume(volumePercent);
+        SoundManager.getInstance().setEnabled(true);
     }
 
     public String getPlayer1Name() {
@@ -187,5 +213,9 @@ public class SettingsPanel extends JPanel {
     public String getPlayer2Name() {
         String name = p2Field.getText().trim();
         return name.isEmpty() ? "Player 2" : name;
+    }
+    
+    public int getMasterVolume() {
+        return volumeSlider.getValue();
     }
 }

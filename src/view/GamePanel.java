@@ -231,11 +231,10 @@ public class GamePanel extends JPanel {
             if (trail.size() > 22) {
                 trail.remove(0);
             }
-        } else if (state.getPhase() != GameState.Phase.BALLS_MOVING) {
+        } else {
             trail.clear();
         }
     }
-
     private void drawTrail(Graphics2D g) {
         if (trail.size() < 2) {
             return;
