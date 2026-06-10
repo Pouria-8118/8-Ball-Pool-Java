@@ -10,6 +10,7 @@ import model.Table;
 import physics.PhysicsEngine;
 import view.GamePanel;
 import view.PlayerInfoPanel;
+import view.SoundManager;
 
 import java.awt.Color;
 import java.time.LocalDate;
@@ -268,6 +269,7 @@ public class GameController {
         physicsEngine.resetTurnTracking();
         gamePanel.notifyShot();
         physicsEngine.shoot(cue, angle, power, gameState.getSelectedSpin());
+        SoundManager.getInstance().playCueHit();
         gameState.setPhase(GameState.Phase.BALLS_MOVING);
     }
 

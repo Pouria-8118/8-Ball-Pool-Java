@@ -4,6 +4,7 @@ import model.Ball;
 import model.GameState;
 import model.Pocket;
 import model.SpinType;
+import view.SoundManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,6 +130,7 @@ public class PhysicsEngine {
                     }
                     
                     collisionHandler.resolveBallCollision(a, b);
+                    SoundManager.getInstance().playBallCollision();
                     
                     if (wasFirstHit && firstHitBall != null && hitBall != null) {
                         if (a.isCueBall()) {
@@ -174,6 +176,7 @@ public class PhysicsEngine {
     private void startPocketing(Ball ball, Pocket pocket) {
         ball.setVelocityX(0);
         ball.setVelocityY(0);
+        SoundManager.getInstance().playPocket();
         ball.setPocketed(true);
         ball.setPocketAnimScale(1.0);
 
