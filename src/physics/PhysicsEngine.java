@@ -15,6 +15,7 @@ public class PhysicsEngine {
     private static final double STOP_SPEED         = 0.11;
     private static final double POCKET_PULL_RADIUS = Pocket.RADIUS * 1.2;
     private static final double POCKET_ANIM_SPEED  = 0.06;
+    private SpinType currentSpin = SpinType.NONE;
 
     private CollisionHandler collisionHandler;
     private List<Ball>       pocketedThisTurn;
@@ -33,11 +34,15 @@ public class PhysicsEngine {
         wallHitsThisTurn = 0;
         cueBallPocketed  = false;
         firstHitBall     = null;
+        currentSpin      = SpinType.NONE;
+
     }
 
     public void shoot(Ball cueBall, double angle, double power, SpinType spin) {
         cueBall.setVelocityX(Math.cos(angle) * power);
         cueBall.setVelocityY(Math.sin(angle) * power);
+        this.currentSpin = spin;
+
     }
 
     public void update(GameState state) {
@@ -51,7 +56,6 @@ public class PhysicsEngine {
 
         checkPockets(state.getBalls(), state.getTable().getPockets());
         updatePocketAnimations(state.getBalls());
-        applySpinEffect(state.getCueBall(), state.getSelectedSpin());
     }
 
     private void applyFrictionAndMove(List<Ball> balls, double friction) {
@@ -110,20 +114,34 @@ public class PhysicsEngine {
                 }
 
                 if (collisionHandler.areBallsOverlapping(a, b)) {
-                    if (firstHitBall == null) {
+                    boolean wasFirstHit = (firstHitBall == null);
+                    Ball hitBall = null;
+                    
+                    if (wasFirstHit) {
                         if (a.isCueBall()) {
                             firstHitBall = b;
+                            hitBall = b;
                         }
                         if (b.isCueBall()) {
                             firstHitBall = a;
+                            hitBall = a;
                         }
                     }
+                    
                     collisionHandler.resolveBallCollision(a, b);
+                    
+                    if (wasFirstHit && firstHitBall != null && hitBall != null) {
+                        if (a.isCueBall()) {
+                            applySpinAfterCollision(a, currentSpin, hitBall);
+                        }
+                        if (b.isCueBall()) {
+                            applySpinAfterCollision(b, currentSpin, hitBall);
+                        }
+                    }
                 }
             }
         }
     }
-
     private void checkPockets(List<Ball> balls, List<Pocket> pockets) {
         for (Ball ball : balls) {
             if (ball.isPocketed()) {
@@ -141,7 +159,7 @@ public class PhysicsEngine {
                     break;
                 }
 
-                if (dist < Pocket.RADIUS * 1.8) {
+                if (dist < Pocket.RADIUS * 1.7) {
                     double pullStrength = 0.08;
                     Vector dir = diff.normalize();
                     Vector pull = dir.scale(pullStrength);
@@ -180,32 +198,69 @@ public class PhysicsEngine {
         }
     }
 
-    private void applySpinEffect(Ball cueBall, SpinType spin) {
+    private void applySpinAfterCollision(Ball cueBall, SpinType spin, Ball hitBall) {
         if (cueBall == null || cueBall.isPocketed()) {
             return;
         }
-
+        
         Vector vel = new Vector(cueBall.getVelocityX(), cueBall.getVelocityY());
         double speed = vel.length();
-
-        if (speed < 0.8) {
+        
+        if (speed < 0.5) {
             return;
         }
-
-        Vector dir = vel.normalize();
-
-        if (spin == SpinType.TOP) {
-            Vector topForce = dir.scale(0.012);
-            Vector newVel = vel.add(topForce);
-            cueBall.setVelocityX(newVel.getX());
-            cueBall.setVelocityY(newVel.getY());
+        
+        Vector dirToHit = new Vector(hitBall.getX() - cueBall.getX(), hitBall.getY() - cueBall.getY());
+        dirToHit = dirToHit.normalize();
+        
+        Vector velDir = vel.normalize();
+        
+        double dotProduct = velDir.getX() * dirToHit.getX() + velDir.getY() * dirToHit.getY();
+        boolean isFullHit = Math.abs(dotProduct) > 0.95;
+        
+        Vector tangent = new Vector(-dirToHit.getY(), dirToHit.getX());
+        tangent = tangent.normalize();
+        
+        if (spin == SpinType.NONE) {
+            if (isFullHit) {
+                cueBall.setVelocityX(0);
+                cueBall.setVelocityY(0);
+            } else {
+                Vector tangentMove = tangent.scale(speed * 0.4);
+                cueBall.setVelocityX(tangentMove.getX());
+                cueBall.setVelocityY(tangentMove.getY());
+            }
+            return;
         }
-
+        
+        if (spin == SpinType.TOP) {
+            if (isFullHit) {
+                Vector forward = velDir.scale(speed);
+                cueBall.setVelocityX(forward.getX());
+                cueBall.setVelocityY(forward.getY());
+            } else {
+                Vector tangentMove = tangent.scale(speed * 0.3);
+                Vector forwardMove = velDir.scale(speed * 0.5);
+                Vector newVel = tangentMove.add(forwardMove);
+                cueBall.setVelocityX(newVel.getX());
+                cueBall.setVelocityY(newVel.getY());
+            }
+            return;
+        }
+        
         if (spin == SpinType.BACK) {
-            Vector backForce = dir.scale(-0.05);
-            Vector newVel = vel.add(backForce);
-            cueBall.setVelocityX(newVel.getX());
-            cueBall.setVelocityY(newVel.getY());
+            if (isFullHit) {
+                Vector backward = velDir.scale(-speed * 0.6);
+                cueBall.setVelocityX(backward.getX());
+                cueBall.setVelocityY(backward.getY());
+            } else {
+                Vector tangentMove = tangent.scale(speed * 0.3);
+                Vector backwardMove = velDir.scale(-speed * 0.4);
+                Vector newVel = tangentMove.add(backwardMove);
+                cueBall.setVelocityX(newVel.getX());
+                cueBall.setVelocityY(newVel.getY());
+            }
+            return;
         }
     }
 

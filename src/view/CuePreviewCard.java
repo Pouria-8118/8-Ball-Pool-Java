@@ -238,4 +238,4 @@ public class CuePreviewCard extends JPanel {
         }
         return "Unknown";
     }
-} 
+}  
