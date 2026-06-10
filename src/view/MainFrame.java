@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import model.CueType;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -12,11 +13,15 @@ public class MainFrame extends JFrame {
 
     private static MainFrame instance;
 
-    private CardLayout    cardLayout;
-    private JPanel        mainPanel;
-    private GamePanel     gamePanel;
-    private SettingsPanel settingsPanel;
-    private RecordsPanel  recordsPanel;
+    private CardLayout       cardLayout;
+    private JPanel           mainPanel;
+    private GamePanel        gamePanel;
+    private SettingsPanel    settingsPanel;
+    private RecordsPanel     recordsPanel;
+    private CueSelectionPanel cueSelectionPanel;
+
+    private CueType p1CueType = CueType.CLASSIC;
+    private CueType p2CueType = CueType.CLASSIC;
 
     private MainFrame() {
         setTitle("8-Ball Billiard");
@@ -49,6 +54,9 @@ public class MainFrame extends JFrame {
         recordsPanel = new RecordsPanel();
         mainPanel.add(recordsPanel, "records");
 
+        cueSelectionPanel = new CueSelectionPanel();
+        mainPanel.add(cueSelectionPanel, "cueselection");
+
         cardLayout.show(mainPanel, "menu");
         setSize(960, 630);
         setMinimumSize(new Dimension(960, 630));
@@ -61,11 +69,25 @@ public class MainFrame extends JFrame {
             String p2         = settingsPanel.getPlayer2Name();
             GameController gc = new GameController(gamePanel);
             gamePanel.setGameController(gc);
+            gamePanel.setCueTypes(p1CueType, p2CueType);
             gc.startNewGame(p1, p2);
         }
         if (name.equals("records")) {
             recordsPanel.refresh();
         }
         cardLayout.show(mainPanel, name);
+    }
+
+    public void showCueSelection() {
+        cueSelectionPanel.setPlayerNames(
+                settingsPanel.getPlayer1Name(),
+                settingsPanel.getPlayer2Name());
+        cardLayout.show(mainPanel, "cueselection");
+    }
+
+    public void onCueSelectionDone(CueType p1Type, CueType p2Type) {
+        this.p1CueType = p1Type;
+        this.p2CueType = p2Type;
+        cardLayout.show(mainPanel, "settings");
     }
 }

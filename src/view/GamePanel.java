@@ -40,8 +40,10 @@ public class GamePanel extends JPanel {
     private int     mouseX           = 400;
     private int     mouseY           = 300;
     private boolean blockNextRelease = false;
-
     private List<double[]> trail;
+
+    private model.CueType p1CueType = model.CueType.CLASSIC;
+    private model.CueType p2CueType = model.CueType.CLASSIC;
 
     public GamePanel() {
         setLayout(null);
@@ -125,6 +127,11 @@ public class GamePanel extends JPanel {
             drawBalls(g2, state);
             drawSelectedPocket(g2, state);
             drawAimLine(g2, state);
+            if (state.getCurrentPlayer() == state.getPlayer1()) {
+                cueStick.setCueType(p1CueType);
+            } else {
+                cueStick.setCueType(p2CueType);
+            }
             cueStick.tick();
             cueStick.draw(g2, state, mouseX, mouseY);
             drawPowerBar(g2, state);
@@ -429,6 +436,11 @@ public class GamePanel extends JPanel {
         g.setColor(new Color(140, 200, 255, 160));
         g.setFont(new Font("Arial", Font.PLAIN, 12));
         g.drawString("Place here", TABLE_X + 16, TABLE_Y + TABLE_HEIGHT / 2 + 4);
+    }
+
+    public void setCueTypes(model.CueType p1Type, model.CueType p2Type) {
+        this.p1CueType = p1Type;
+        this.p2CueType = p2Type;
     }
 
     public void showSpinSelector() {

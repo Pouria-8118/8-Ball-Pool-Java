@@ -75,7 +75,19 @@ public class SettingsPanel extends JPanel {
         form.add(soundBox, gbc);
 
         add(form, BorderLayout.CENTER);
+        
+        JButton cueBtn = styledBtn("Choose Cues", new Color(60, 80, 110));
+        cueBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                MainFrame.getInstance().showCueSelection();
+            }
+        });
 
+        gbc.gridx = 0; gbc.gridy = 3;
+        form.add(styledLabel("Cue Sticks:"), gbc);
+        gbc.gridx = 1;
+        form.add(cueBtn, gbc);
         JPanel btns = new JPanel();
         btns.setBackground(new Color(16, 16, 26));
         btns.setBorder(BorderFactory.createEmptyBorder(0, 0, 34, 0));
