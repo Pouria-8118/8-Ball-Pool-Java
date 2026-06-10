@@ -538,6 +538,8 @@ public class GameController {
                 gameState.getPlayer1().getName(),
                 gameState.getPlayer2().getName(),
                 winner.getName(),
+                gameState.getPlayer1().getScore(),
+                gameState.getPlayer2().getScore(),
                 LocalDate.now().toString());
         dbController.saveRecord(rec);
 
@@ -547,7 +549,6 @@ public class GameController {
 
         gamePanel.showGameOver(winner.getName());
     }
-
     private void restartGame() {
         if (gameLoop != null) {
             gameLoop.stop();

@@ -76,7 +76,7 @@ public class RecordsPanel extends JPanel {
     public void refresh() {
         listPanel.removeAll();
 
-        listPanel.add(buildRow("Player 1", "Player 2", "Winner", "Date", true));
+        listPanel.add(buildRow("Player 1", "Player 2", "Score 1", "Score 2", "Winner", "Date", true));
         listPanel.add(Box.createRigidArea(new Dimension(0, 4)));
 
         List<GameRecord> records = dbController.loadRecords();
@@ -93,7 +93,9 @@ public class RecordsPanel extends JPanel {
         for (GameRecord r : records) {
             listPanel.add(buildRow(
                     r.getPlayer1Name(), r.getPlayer2Name(),
-                    r.getWinnerName(),  r.getDate(), false));
+                    String.valueOf(r.getPlayer1Score()),
+                    String.valueOf(r.getPlayer2Score()),
+                    r.getWinnerName(), r.getDate(), false));
             listPanel.add(Box.createRigidArea(new Dimension(0, 3)));
         }
 
@@ -101,10 +103,10 @@ public class RecordsPanel extends JPanel {
         listPanel.repaint();
     }
 
-    private JPanel buildRow(String p1, String p2, String winner,
-                            String date, boolean header) {
-        JPanel row = new JPanel(new GridLayout(1, 4, 10, 0));
-        row.setMaximumSize(new Dimension(900, 44));
+    private JPanel buildRow(String p1, String p2, String score1, String score2,
+                            String winner, String date, boolean header) {
+        JPanel row = new JPanel(new GridLayout(1, 6, 10, 0));
+        row.setMaximumSize(new Dimension(1100, 44));
         row.setBackground(header ? new Color(38, 38, 58) : new Color(22, 22, 34));
         row.setBorder(BorderFactory.createEmptyBorder(7, 14, 7, 14));
 
@@ -115,6 +117,8 @@ public class RecordsPanel extends JPanel {
 
         row.add(rowLabel(p1,     style, defCol));
         row.add(rowLabel(p2,     style, defCol));
+        row.add(rowLabel(score1, style, defCol));
+        row.add(rowLabel(score2, style, defCol));
         row.add(rowLabel(winner, style, winCol));
         row.add(rowLabel(date,   style, datCol));
 
@@ -123,7 +127,7 @@ public class RecordsPanel extends JPanel {
 
     private JLabel rowLabel(String text, int style, Color color) {
         JLabel lbl = new JLabel(text, SwingConstants.CENTER);
-        lbl.setFont(new Font("Arial", style, 14));
+        lbl.setFont(new Font("Arial", style, 13));
         lbl.setForeground(color);
         return lbl;
     }
