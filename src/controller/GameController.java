@@ -248,10 +248,31 @@ public class GameController {
     }
 
     public void onSpinSelected(SpinType spin) {
-        gameState.setSelectedSpin(spin);
-        gameState.setPhase(GameState.Phase.AIMING);
-        gamePanel.hideSpinSelector();
-    }
+            gameState.setSelectedSpin(spin);
+            gameState.setPhase(GameState.Phase.AIMING);
+            gamePanel.hideSpinSelector();
+            gamePanel.startShotTimer(new Runnable() {
+                @Override
+                public void run() {
+                    onTimerExpired();
+                }
+            });
+        }
+
+        private void onTimerExpired() {
+            if (gameState == null) {
+                return;
+            }
+            if (gameState.getPhase() != GameState.Phase.AIMING) {
+                return;
+            }
+
+            Player current  = gameState.getCurrentPlayer();
+            Player opponent = gameState.getOpponent(current);
+            opponent.setBallInHand(true);
+            gamePanel.resetShotTimer();
+            doFoul(current, opponent, false);
+        }
 
     private void doShoot(int mx, int my) {
         Ball   cue   = gameState.getCueBall();
@@ -270,6 +291,7 @@ public class GameController {
         gamePanel.notifyShot();
         physicsEngine.shoot(cue, angle, power, gameState.getSelectedSpin());
         SoundManager.getInstance().playCueHit();
+        gamePanel.stopShotTimer();
         gameState.setPhase(GameState.Phase.BALLS_MOVING);
     }
 
@@ -516,6 +538,7 @@ public class GameController {
     }
 
     private void switchTurn(String message, Player next) {
+        gamePanel.resetShotTimer();
         Player old = gameState.getCurrentPlayer();
         old.setBallInHand(false);
         gameState.setCurrentPlayer(next);

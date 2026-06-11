@@ -34,7 +34,8 @@ public class GamePanel extends JPanel {
     private CueStick        cueStick;
     private SpinSelector    spinSelector;
     private Announcement    announcement;
-
+    private AimLineRenderer aimLineRenderer;
+    private ShotTimer       shotTimer;
     private double  aimAngle         = 0;
     private double  aimPower         = 0;
     private int     mouseX           = 400;
@@ -54,7 +55,8 @@ public class GamePanel extends JPanel {
         spinSelector = new SpinSelector();
         announcement = new Announcement();
         trail        = new ArrayList<>();
-
+        aimLineRenderer = new AimLineRenderer();
+        shotTimer       = new ShotTimer();
         playerInfoPanel = new PlayerInfoPanel();
         playerInfoPanel.setBounds(0, 500, 960, 95);
         add(playerInfoPanel);
@@ -126,7 +128,8 @@ public class GamePanel extends JPanel {
             drawTrail(g2);
             drawBalls(g2, state);
             drawSelectedPocket(g2, state);
-            drawAimLine(g2, state);
+            aimLineRenderer.draw(g2, state, aimAngle);
+            shotTimer.draw(g2, getWidth());            
             if (state.getCurrentPlayer() == state.getPlayer1()) {
                 cueStick.setCueType(p1CueType);
             } else {
@@ -364,30 +367,17 @@ public class GamePanel extends JPanel {
         return false;
     }
 
-    private void drawAimLine(Graphics2D g, GameState state) {
-        if (state.getPhase() != GameState.Phase.AIMING) {
-            return;
+    public void startShotTimer(Runnable onTimeUp) {
+            shotTimer.start(onTimeUp);
         }
 
-        Ball cue = state.getCueBall();
-        if (cue == null || cue.isPocketed()) {
-            return;
+        public void stopShotTimer() {
+            shotTimer.stop();
         }
 
-        int cx  = (int) cue.getX();
-        int cy  = (int) cue.getY();
-        int len = 200;
-        int ex  = (int)(cx - Math.cos(aimAngle) * len);
-        int ey  = (int)(cy - Math.sin(aimAngle) * len);
-
-        g.setColor(new Color(255, 255, 255, 60));
-        g.setStroke(new BasicStroke(1.3f,
-                BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-                0, new float[]{5f, 7f}, 0));
-        g.drawLine(cx, cy, ex, ey);
-        g.setStroke(new BasicStroke(1));
-    }
-
+        public void resetShotTimer() {
+            shotTimer.reset();
+        }
     private void drawPowerBar(Graphics2D g, GameState state) {
         if (state.getPhase() != GameState.Phase.AIMING) {
             return;

@@ -17,8 +17,9 @@ public class PhysicsEngine {
     private static final double POCKET_PULL_RADIUS  = Pocket.RADIUS * 1.2;
     private static final double POCKET_ANIM_SPEED   = 0.06;
 
-    private static final double BACK_DECEL_STRENGTH = 0.15;
+    private static final double BACK_DECEL_STRENGTH = 0.12;
     private static final double TOP_ACCEL_STRENGTH  = 0.10;
+    private static final double SIDE_ACCEL_STRENGTH = 0.09;
     private static final int    SPIN_FRAMES         = 25;
 
     private CollisionHandler collisionHandler;
@@ -223,6 +224,32 @@ public class PhysicsEngine {
             spinDirY       = hitNy;
             spinFramesLeft = SPIN_FRAMES;
             firstCollisionDone = true;
+            return;
+        }
+
+        if (currentSpin == SpinType.LEFT) {
+            applySideSpinImmediate(cueBall, incomingSpeed, hitNx, hitNy,
+                                   tangentX, tangentY, fullHit, true);
+            double perpX       = -hitNy;
+            double perpY       =  hitNx;
+            wasFullHit         = fullHit;
+            spinDirX           = perpX;
+            spinDirY           = perpY;
+            spinFramesLeft     = SPIN_FRAMES;
+            firstCollisionDone = true;
+            return;
+        }
+
+        if (currentSpin == SpinType.RIGHT) {
+            applySideSpinImmediate(cueBall, incomingSpeed, hitNx, hitNy,
+                                   tangentX, tangentY, fullHit, false);
+            double perpX       =  hitNy;
+            double perpY       = -hitNx;
+            wasFullHit         = fullHit;
+            spinDirX           = perpX;
+            spinDirY           = perpY;
+            spinFramesLeft     = SPIN_FRAMES;
+            firstCollisionDone = true;
         }
     }
 
@@ -245,12 +272,12 @@ public class PhysicsEngine {
                                          double tangentX, double tangentY,
                                          boolean fullHit) {
         if (fullHit) {
-            double backSpeed = speed * 0.55;
+            double backSpeed = speed * 0.48;
             cueBall.setVelocityX(-hitNx * backSpeed);
             cueBall.setVelocityY(-hitNy * backSpeed);
         } else {
             double tangentSpeed  = speed * 0.30;
-            double backwardSpeed = speed * 0.20;
+            double backwardSpeed = speed * 0.18;
             cueBall.setVelocityX(tangentX * tangentSpeed - hitNx * backwardSpeed);
             cueBall.setVelocityY(tangentY * tangentSpeed - hitNy * backwardSpeed);
         }
@@ -269,6 +296,25 @@ public class PhysicsEngine {
             double forwardSpeed  = speed * 0.35;
             cueBall.setVelocityX(tangentX * tangentSpeed + hitNx * forwardSpeed);
             cueBall.setVelocityY(tangentY * tangentSpeed + hitNy * forwardSpeed);
+        }
+    }
+
+    private void applySideSpinImmediate(Ball cueBall, double speed,
+                                         double hitNx, double hitNy,
+                                         double tangentX, double tangentY,
+                                         boolean fullHit, boolean isLeft) {
+        double perpX = isLeft ?  hitNy : -hitNy;
+        double perpY = isLeft ? -hitNx :  hitNx;
+
+        if (fullHit) {
+            double sideSpeed = speed * 0.52;
+            cueBall.setVelocityX(perpX * sideSpeed);
+            cueBall.setVelocityY(perpY * sideSpeed);
+        } else {
+            double tangentSpeed = speed * 0.20;
+            double sideSpeed    = speed * 0.32;
+            cueBall.setVelocityX(tangentX * tangentSpeed + perpX * sideSpeed);
+            cueBall.setVelocityY(tangentY * tangentSpeed + perpY * sideSpeed);
         }
     }
 
@@ -314,6 +360,24 @@ public class PhysicsEngine {
             } else {
                 if (currentSpeed > STOP_SPEED * 2) {
                     double blendStrength = progress * 0.05;
+                    double newVx = currentVx * (1.0 - blendStrength)
+                                 + spinDirX   * currentSpeed * blendStrength;
+                    double newVy = currentVy * (1.0 - blendStrength)
+                                 + spinDirY   * currentSpeed * blendStrength;
+                    cueBall.setVelocityX(newVx);
+                    cueBall.setVelocityY(newVy);
+                }
+            }
+        }
+
+        if (currentSpin == SpinType.LEFT || currentSpin == SpinType.RIGHT) {
+            if (wasFullHit) {
+                double forceStr = SIDE_ACCEL_STRENGTH * progress;
+                cueBall.setVelocityX(currentVx + spinDirX * forceStr);
+                cueBall.setVelocityY(currentVy + spinDirY * forceStr);
+            } else {
+                if (currentSpeed > STOP_SPEED * 2) {
+                    double blendStrength = progress * 0.06;
                     double newVx = currentVx * (1.0 - blendStrength)
                                  + spinDirX   * currentSpeed * blendStrength;
                     double newVy = currentVy * (1.0 - blendStrength)
