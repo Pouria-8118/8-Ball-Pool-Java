@@ -117,7 +117,7 @@ public class MainMenuPanel extends JPanel {
         panel.setBackground(new Color(12, 12, 20));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 16, 0));
 
-        JLabel lbl = new JLabel("v1.0");
+        JLabel lbl = new JLabel("v2.1");
         lbl.setForeground(new Color(60, 60, 60));
         lbl.setFont(new Font("Arial", Font.PLAIN, 11));
         panel.add(lbl);
