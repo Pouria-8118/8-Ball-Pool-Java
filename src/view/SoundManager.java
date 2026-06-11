@@ -64,5 +64,13 @@ public class SoundManager {
     public void playPocket() {
         play("pocket.wav");
     }
+    
+    public void playFoul() {
+        play("foul.wav");
+    }
+
+    public void playWin() {
+        play("win.wav");
+    }
 
 }

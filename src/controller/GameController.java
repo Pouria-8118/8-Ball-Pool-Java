@@ -455,7 +455,7 @@ public class GameController {
             cue.setVelocityY(0);
             cue.setPocketAnimScale(1.0);
         }
-
+        SoundManager.getInstance().playFoul();
         opponent.setBallInHand(true);
         gameState.setSelectedPocket(null);
         gameState.setSelectedSpin(SpinType.NONE);
@@ -558,7 +558,7 @@ public class GameController {
 
     private void endGame(Player winner, String reason) {
         gameState.setPhase(GameState.Phase.GAME_OVER);
-
+        SoundManager.getInstance().playWin();
         GameRecord rec = new GameRecord(
                 gameState.getPlayer1().getName(),
                 gameState.getPlayer2().getName(),
