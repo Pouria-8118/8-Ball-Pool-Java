@@ -22,6 +22,8 @@ public class DatabaseController {
             String line = record.getPlayer1Name() + ","
                     + record.getPlayer2Name() + ","
                     + record.getWinnerName()  + ","
+                    + record.getPlayer1Score() + ","
+                    + record.getPlayer2Score() + ","
                     + record.getDate();
             bw.write(line);
             bw.newLine();
@@ -44,8 +46,17 @@ public class DatabaseController {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 4) {
-                    records.add(new GameRecord(parts[0], parts[1], parts[2], parts[3]));
+                if (parts.length == 6) {
+                    records.add(new GameRecord(
+                        parts[0], parts[1], parts[2],
+                        Integer.parseInt(parts[3]),
+                        Integer.parseInt(parts[4]),
+                        parts[5]
+                    ));
+                } else if (parts.length == 4) {
+                    records.add(new GameRecord(
+                        parts[0], parts[1], parts[2], 0, 0, parts[3]
+                    ));
                 }
             }
             br.close();
