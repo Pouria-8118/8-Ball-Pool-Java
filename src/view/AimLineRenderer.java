@@ -25,8 +25,8 @@ public class AimLineRenderer {
             return;
         }
 
-        double dirX = Math.cos(aimAngle);
-        double dirY = Math.sin(aimAngle);
+        double dirX = Math.cos(aimAngle + Math.PI);
+        double dirY = Math.sin(aimAngle + Math.PI);
 
         RayResult result = castRay(cue.getX(), cue.getY(),
                                    dirX, dirY, state, cue);
@@ -35,7 +35,7 @@ public class AimLineRenderer {
                     result.hitX, result.hitY);
 
         if (result.hitType == HitType.BALL) {
-            drawBallHitResult(g, result, dirX, dirY, state, cue.getX(), cue.getY());
+            drawBallHitResult(g, result, dirX, dirY, state);
         } else if (result.hitType == HitType.WALL) {
             drawWallReflection(g, result, dirX, dirY, state);
         } else if (result.hitType == HitType.POCKET) {
@@ -56,33 +56,47 @@ public class AimLineRenderer {
 
     private void drawBallHitResult(Graphics2D g, RayResult result,
                                     double inDirX, double inDirY,
-                                    GameState state, double cueStartX, double cueStartY) {
-        g.setColor(new Color(255, 220, 80, 130));
-        g.setStroke(new BasicStroke(2f));
+                                    GameState state) {
+        if (result.hitBall == null) {
+            return;
+        }
+        
         int hr = Ball.RADIUS;
-        g.drawOval((int) result.hitX - hr, (int) result.hitY - hr,
-                   hr * 2, hr * 2);
+        double cx = result.hitBall.getX();
+        double cy = result.hitBall.getY();
+        
+        g.setColor(new Color(255, 200, 60, 100));
+        g.setStroke(new BasicStroke(2.5f));
+        g.drawOval((int) cx - hr - 2, (int) cy - hr - 2,
+                   (hr + 2) * 2, (hr + 2) * 2);
         g.setStroke(new BasicStroke(1));
 
         double hitNx = result.normalX;
         double hitNy = result.normalY;
 
-        double dot        = inDirX * hitNx + inDirY * hitNy;
+        double dot = inDirX * hitNx + inDirY * hitNy;
         boolean isFullHit = dot > 0.92;
 
-        double targetDirX = hitNx;
-        double targetDirY = hitNy;
+        double targetDirX = -hitNx;
+        double targetDirY = -hitNy;
 
         double targetLineLen = 70;
-        g.setColor(new Color(255, 180, 50, 120));
-        g.setStroke(new BasicStroke(1.5f,
+        g.setColor(new Color(255, 200, 60, 200));
+        g.setStroke(new BasicStroke(2.0f,
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-                0, new float[]{4f, 5f}, 0));
-        g.drawLine((int) result.hitX,
-                   (int) result.hitY,
-                   (int)(result.hitX + targetDirX * targetLineLen),
-                   (int)(result.hitY + targetDirY * targetLineLen));
+                0, new float[]{3f, 6f}, 0));
+        g.drawLine((int) cx, (int) cy,
+                   (int)(cx + targetDirX * targetLineLen),
+                   (int)(cy + targetDirY * targetLineLen));
         g.setStroke(new BasicStroke(1));
+
+        double tx = -hitNy;
+        double ty =  hitNx;
+        double tDot = inDirX * tx + inDirY * ty;
+        if (tDot < 0) {
+            tx = -tx;
+            ty = -ty;
+        }
 
         double cueContinueDirX;
         double cueContinueDirY;
@@ -91,27 +105,19 @@ public class AimLineRenderer {
             cueContinueDirX = 0;
             cueContinueDirY = 0;
         } else {
-            double tx = -hitNy;
-            double ty =  hitNx;
-            double tDot = inDirX * tx + inDirY * ty;
-            if (tDot < 0) {
-                tx = -tx;
-                ty = -ty;
-            }
             cueContinueDirX = tx;
             cueContinueDirY = ty;
         }
 
         if (cueContinueDirX != 0 || cueContinueDirY != 0) {
             double cueLineLen = 55;
-            g.setColor(new Color(150, 220, 255, 100));
-            g.setStroke(new BasicStroke(1.2f,
+            g.setColor(new Color(150, 220, 255, 120));
+            g.setStroke(new BasicStroke(1.5f,
                     BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
-                    0, new float[]{3f, 6f}, 0));
-            g.drawLine((int) result.hitX,
-                       (int) result.hitY,
-                       (int)(result.hitX + cueContinueDirX * cueLineLen),
-                       (int)(result.hitY + cueContinueDirY * cueLineLen));
+                    0, new float[]{3f, 8f}, 0));
+            g.drawLine((int) cx, (int) cy,
+                       (int)(cx + cueContinueDirX * cueLineLen),
+                       (int)(cy + cueContinueDirY * cueLineLen));
             g.setStroke(new BasicStroke(1));
         }
     }
@@ -159,7 +165,7 @@ public class AimLineRenderer {
         double normLen = Math.sqrt(dirX * dirX + dirY * dirY);
 
         if (normLen < 0.001) {
-            return new RayResult(x, y, HitType.NONE, 0, 0);
+            return new RayResult(x, y, HitType.NONE, 0, 0, null);
         }
 
         double ndx = dirX / normLen;
@@ -175,7 +181,7 @@ public class AimLineRenderer {
                 double dist = Math.sqrt(dx * dx + dy * dy);
                 if (dist < Pocket.RADIUS) {
                     return new RayResult(pocket.getX(), pocket.getY(),
-                                         HitType.POCKET, 0, 0);
+                                         HitType.POCKET, 0, 0, null);
                 }
             }
 
@@ -194,7 +200,7 @@ public class AimLineRenderer {
                 if (dist < Ball.RADIUS * 2) {
                     double hnx = (x - ball.getX()) / Math.max(dist, 0.001);
                     double hny = (y - ball.getY()) / Math.max(dist, 0.001);
-                    return new RayResult(x, y, HitType.BALL, hnx, hny);
+                    return new RayResult(x, y, HitType.BALL, hnx, hny, ball);
                 }
             }
 
@@ -223,11 +229,11 @@ public class AimLineRenderer {
             }
 
             if (wallHit) {
-                return new RayResult(x, y, HitType.WALL, wallNx, wallNy);
+                return new RayResult(x, y, HitType.WALL, wallNx, wallNy, null);
             }
         }
 
-        return new RayResult(x, y, HitType.NONE, 0, 0);
+        return new RayResult(x, y, HitType.NONE, 0, 0, null);
     }
 
     private enum HitType {
@@ -235,20 +241,21 @@ public class AimLineRenderer {
     }
 
     private static class RayResult {
-
         double  hitX;
         double  hitY;
         HitType hitType;
         double  normalX;
         double  normalY;
+        Ball    hitBall;
 
         RayResult(double hitX, double hitY, HitType hitType,
-                  double normalX, double normalY) {
+                  double normalX, double normalY, Ball hitBall) {
             this.hitX    = hitX;
             this.hitY    = hitY;
             this.hitType = hitType;
             this.normalX = normalX;
             this.normalY = normalY;
+            this.hitBall = hitBall;
         }
     }
 }
