@@ -98,7 +98,7 @@ public class ShotTimer {
         int barW    = 200;
         int barH    = 14;
         int barX    = screenW / 2 - barW / 2 + (int) shakeOffset;
-        int barY    = 20;
+        int barY    = 10;
         int fillW   = (int)(barW * ratio);
 
         g.setColor(new Color(30, 30, 30, 200));
@@ -125,7 +125,7 @@ public class ShotTimer {
         g.setStroke(new BasicStroke(1));
 
         String timeText = String.valueOf(secondsLeft);
-        g.setFont(new Font("Arial", Font.BOLD, critical ? 16 : 14));
+        g.setFont(new Font("Arial", Font.BOLD, critical ? 12 : 10));
         FontMetrics fm  = g.getFontMetrics();
 
         Color textColor = critical ? new Color(255, 80, 80) : new Color(220, 220, 220);

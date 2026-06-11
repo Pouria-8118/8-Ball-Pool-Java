@@ -3,6 +3,7 @@ package view;
 import model.Ball;
 import model.GameState;
 import model.Pocket;
+import model.SpinType;
 import model.Table;
 
 import java.awt.BasicStroke;
@@ -61,6 +62,7 @@ public class AimLineRenderer {
             return;
         }
         
+        SpinType currentSpin = state.getSelectedSpin();
         int hr = Ball.RADIUS;
         double cx = result.hitBall.getX();
         double cy = result.hitBall.getY();
@@ -68,7 +70,7 @@ public class AimLineRenderer {
         g.setColor(new Color(255, 200, 60, 100));
         g.setStroke(new BasicStroke(2.5f));
         g.drawOval((int) cx - hr - 2, (int) cy - hr - 2,
-                   (hr + 2) * 2, (hr + 2) * 2);
+                (hr + 2) * 2, (hr + 2) * 2);
         g.setStroke(new BasicStroke(1));
 
         double hitNx = result.normalX;
@@ -86,8 +88,8 @@ public class AimLineRenderer {
                 BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
                 0, new float[]{3f, 6f}, 0));
         g.drawLine((int) cx, (int) cy,
-                   (int)(cx + targetDirX * targetLineLen),
-                   (int)(cy + targetDirY * targetLineLen));
+                (int)(cx + targetDirX * targetLineLen),
+                (int)(cy + targetDirY * targetLineLen));
         g.setStroke(new BasicStroke(1));
 
         double tx = -hitNy;
@@ -100,24 +102,40 @@ public class AimLineRenderer {
 
         double cueContinueDirX;
         double cueContinueDirY;
-
+        
         if (isFullHit) {
-            cueContinueDirX = 0;
-            cueContinueDirY = 0;
+            if (currentSpin == SpinType.BACK) {
+                cueContinueDirX = hitNx;
+                cueContinueDirY = hitNy;
+            } else if (currentSpin == SpinType.TOP) {
+                cueContinueDirX = -hitNx;
+                cueContinueDirY = -hitNy;
+            } else {
+                cueContinueDirX = 0;
+                cueContinueDirY = 0;
+            }
         } else {
-            cueContinueDirX = tx;
-            cueContinueDirY = ty;
+            if (currentSpin == SpinType.BACK) {
+                cueContinueDirX = hitNx;
+                cueContinueDirY = hitNy;
+            } else if (currentSpin == SpinType.TOP) {
+                cueContinueDirX = -hitNx;
+                cueContinueDirY = -hitNy;
+            } else {
+                cueContinueDirX = tx;
+                cueContinueDirY = ty;
+            }
         }
 
         if (cueContinueDirX != 0 || cueContinueDirY != 0) {
             double cueLineLen = 55;
-            g.setColor(new Color(150, 220, 255, 120));
-            g.setStroke(new BasicStroke(1.5f,
+            g.setColor(new Color(150, 220, 255, 150));
+            g.setStroke(new BasicStroke(2.0f,
                     BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND,
                     0, new float[]{3f, 8f}, 0));
             g.drawLine((int) cx, (int) cy,
-                       (int)(cx + cueContinueDirX * cueLineLen),
-                       (int)(cy + cueContinueDirY * cueLineLen));
+                    (int)(cx + cueContinueDirX * cueLineLen),
+                    (int)(cy + cueContinueDirY * cueLineLen));
             g.setStroke(new BasicStroke(1));
         }
     }
