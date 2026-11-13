@@ -1,10 +1,6 @@
 # 🎱 8-Ball Pool — Java Swing
 
-> **A two-player 8-ball pool game** with realistic physics, spin control, and a clean MVC architecture — built entirely with Java Swing.
-
-<p align="center">
-  <img src="screenshots/main-menu.png" alt="Main Menu" width="700"/>
-</p>
+> A two-player 8-ball pool game with realistic physics, spin control, and a clean MVC architecture — built entirely with Java Swing.
 
 ---
 
@@ -22,7 +18,6 @@
 - [Project Structure](#-project-structure)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Credits](#-credits)
 
 ---
 
@@ -51,23 +46,22 @@ The project was built to practice **Object-Oriented Programming**, the **MVC pat
 
 ## 📸 Screenshots
 
-All screenshots live in the **`screenshots/`** folder at the repo root. Please name the files exactly as listed below so the README renders them correctly:
-
-| File name | What to capture |
-|---|---|
-| `screenshots/main-menu.png` | The main menu screen (with buttons for New Game, Records, Settings, Exit) |
-| `screenshots/gameplay.png` | Mid-game — table, balls, cue stick, and HUD with player names |
-| `screenshots/spin-controls.png` | The spin selector (left/right) and aim line in action |
-| `screenshots/cue-selection.png` | The cue selection panel with different cue cards |
-| `screenshots/win-screen.png` | The win announcement screen |
-| `screenshots/records.png` | The match records / high-score list |
-
-> **Tip:** Use PNG, keep width around **1200–1400 px**, and compress with [TinyPNG](https://tinypng.com) so the README loads fast.
+<p align="center">
+  <img src="screenshots/main-menu.png" alt="Main Menu" width="45%"/>
+  &nbsp;
+  <img src="screenshots/gameplay.png" alt="Gameplay" width="45%"/>
+</p>
 
 <p align="center">
-  <img src="screenshots/gameplay.png" alt="Gameplay" width="48%"/>
+  <img src="screenshots/spin-controls.png" alt="Spin Controls" width="45%"/>
   &nbsp;
-  <img src="screenshots/spin-controls.png" alt="Spin controls" width="48%"/>
+  <img src="screenshots/cue-selection.png" alt="Cue Selection" width="45%"/>
+</p>
+
+<p align="center">
+  <img src="screenshots/win-screen.png" alt="Win Screen" width="45%"/>
+  &nbsp;
+  <img src="screenshots/records.png" alt="Records" width="45%"/>
 </p>
 
 ---
@@ -76,14 +70,12 @@ All screenshots live in the **`screenshots/`** folder at the repo root. Please n
 
 ### Prerequisites
 
-- **JDK 17 or newer** (tested with JDK 17+). Verify with:
+- **JDK 17 or newer** (the project is tested with JDK 17+). Verify with:
   ```bash
   java -version
   ```
 
 ### Option 1: Gradle (Recommended)
-
-A Gradle build is included, so you don’t need to fiddle with `javac` paths:
 
 ```bash
 # Linux / macOS
@@ -103,15 +95,13 @@ java -jar build/libs/8-ball-pool-2.1.jar
 
 ### Option 2: Plain Java (javac)
 
-If you don’t have Gradle, compile and run manually:
-
 ```bash
 # From the project root
 javac -d out $(find src -name "*.java")
 java -cp out Main
 ```
 
-> Make sure the `sounds/` folder and `settings.properties` stay in the same working directory, because the game loads them at runtime.
+> The `sounds/` folder and `settings.properties` must remain in the same working directory, because the game loads them at runtime.
 
 ---
 
@@ -139,8 +129,6 @@ java -cp out Main
 | Shoot | Release the mouse (or click, depending on the shot mode) |
 | Toggle sound | Settings menu → Sound On/Off |
 
-> If you’ve customized the controls, update this table accordingly.
-
 ---
 
 ## 🛠 Technologies Used
@@ -162,7 +150,7 @@ java -cp out Main
 │   ├── Main.java                  # Entry point
 │   ├── controller/
 │   │   ├── GameController.java    # Game loop, turn logic, rules
-│   │   └── DataBaseController.java# Records read/write (records.txt)
+│   │   └── DatabaseController.java# Records read/write (records.txt)
 │   ├── model/
 │   │   ├── Ball.java
 │   │   ├── Table.java
@@ -188,9 +176,7 @@ java -cp out Main
 │       ├── RecordsPanel.java
 │       └── Announcement.java
 ├── sounds/                        # .wav sound effects
-├── screenshots/                   # README screenshots (see table above)
-├── settings.properties            # Sound on/off & local settings
-├── records.txt                    # Match history (auto-generated)
+├── screenshots/                   # README screenshots
 ├── build.gradle                   # Gradle build script
 ├── settings.gradle
 ├── gradlew / gradlew.bat
@@ -202,8 +188,6 @@ java -cp out Main
 ---
 
 ## 🤝 Contributing
-
-This is a personal/course project, but suggestions and bug reports are welcome!
 
 1. Fork the repo.
 2. Create a branch: `git checkout -b feature/my-feature`.
@@ -218,14 +202,6 @@ Please keep the **MVC separation** intact — put rendering logic in `view/`, ru
 ## 📄 License
 
 Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
-
----
-
-## 🙏 Credits
-
-- **Developer:** [Pouria](https://github.com/Pouria-8118)
-- Built as a Java OOP / Swing practice project.
-- Sound effects: [add source if they’re from freesound.org or similar — e.g. “Ball collision sounds from freesound.org (CC0)”]
 
 ---
 
