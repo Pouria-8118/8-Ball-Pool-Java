@@ -1,27 +1,16 @@
 # 🎱 8-Ball Pool — Java Swing
 
+![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Java Swing](https://img.shields.io/badge/Java%20Swing-GUI-4B8BBE?style=for-the-badge&logo=java&logoColor=white)
+![MVC](https://img.shields.io/badge/Architecture-MVC-6DB33F?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen?style=for-the-badge)
+
 > A two-player 8-ball pool game with realistic physics, spin control, and a clean MVC architecture — built entirely with Java Swing.
 
 ---
 
-## 📖 Table of Contents
-
-- [About the Game](#-about-the-game)
-- [Features](#-features)
-- [Screenshots](#-screenshots)
-- [How to Run](#-how-to-run)
-  - [Option 1: Gradle (Recommended)](#option-1-gradle-recommended)
-  - [Option 2: Plain Java (javac)](#option-2-plain-java-javac)
-- [Gameplay Guide](#-gameplay-guide)
-- [Controls](#-controls)
-- [Technologies Used](#-technologies-used)
-- [Project Structure](#-project-structure)
-- [Contributing](#-contributing)
-- [License](#-license)
-
----
-
-## 🎯 About the Game
+## 📖 About the Game
 
 **8-Ball Pool** is a desktop billiard game for **two players**, written in pure Java with the **Swing** GUI toolkit. It simulates the classic 8-ball rules with a custom **physics engine** — ball collisions, friction, pocket detection, and **spin (English) mechanics** are all implemented from scratch without any external game engine.
 
@@ -33,36 +22,32 @@ The project was built to practice **Object-Oriented Programming**, the **MVC pat
 
 | Category | Details |
 |---|---|
-| 🎮 **Two-Player Mode** | Local pass-and-play — take turns pocketing your group (solids/stripes) and finish with the 8-ball. |
+| **Two-Player Mode** | Local pass-and-play — take turns pocketing your group (solids/stripes) and finish with the 8-ball. |
 | ⚙️ **Custom Physics Engine** | Ball-to-ball and ball-to-cushion collisions, friction decay, and pocket detection — all hand-written (`PhysicsEngine`, `CollisionHandler`). |
-| 🎯 **Spin Control** | Apply **left/right spin (English)** to the cue ball — the aim line and cue stick preview update accordingly. |
-| 🪵 **Cue Selection** | Choose from **multiple cue types** (different power/feel) in the pre-game menu. |
-| 🔊 **Sound Effects** | Collision, pocket, foul, and win sounds — with a **sound on/off toggle** in settings. |
-| 📊 **Match Records** | Every finished match is saved to `records.txt` with player names, scores, and winner. |
-| 🖥️ **Clean Swing UI** | Main menu, cue selection screen, live HUD with player info, and post-game announcement panel. |
-| 🧩 **MVC Architecture** | `model` / `view` / `controller` packages are cleanly separated, with a dedicated `physics` package. |
+| **Spin Control** | Apply **left/right spin (English)** to the cue ball — the aim line and cue stick preview update accordingly. |
+| **Cue Selection** | Choose from **multiple cue types** (different power/feel) in the pre-game menu. |
+| **Sound Effects** | Collision, pocket, foul, and win sounds — with a **sound on/off toggle** in settings. |
+| **Match Records** | Every finished match is saved to `records.txt` with player names, scores, and winner. |
+| 🎨 **Clean Swing UI** | Main menu, cue selection screen, live HUD with player info, and post-game announcement panel. |
+| **MVC Architecture** | `model` / `view` / `controller` packages are cleanly separated, with a dedicated `physics` package. |
 
 ---
 
 ## 📸 Screenshots
 
-<p align="center">
-  <img src="screenshots/main-menu.png" alt="Main Menu" width="45%"/>
-  &nbsp;
-  <img src="screenshots/gameplay.png" alt="Gameplay" width="45%"/>
-</p>
+All screenshots live in the **`screenshots/`** folder at the repo root.
 
-<p align="center">
-  <img src="screenshots/spin-controls.png" alt="Spin Controls" width="45%"/>
-  &nbsp;
-  <img src="screenshots/cue-selection.png" alt="Cue Selection" width="45%"/>
-</p>
+| Main Menu | Gameplay |
+|---|---|
+| ![Main Menu](screenshots/main-menu.png) | ![Gameplay](screenshots/gameplay.png) |
 
-<p align="center">
-  <img src="screenshots/win-screen.png" alt="Win Screen" width="45%"/>
-  &nbsp;
-  <img src="screenshots/records.png" alt="Records" width="45%"/>
-</p>
+| Cue Selection | Spin Controls |
+|---|---|
+| ![Cue Selection](screenshots/cue-selection.png) | ![Spin Controls](screenshots/spin-controls.png) |
+
+| Records | Win Screen |
+|---|---|
+| ![Records](screenshots/records.png) | ![Win Screen](screenshots/win-screen.png) |
 
 ---
 
@@ -70,10 +55,12 @@ The project was built to practice **Object-Oriented Programming**, the **MVC pat
 
 ### Prerequisites
 
-- **JDK 17 or newer** (the project is tested with JDK 17+). Verify with:
-  ```bash
-  java -version
-  ```
+- **JDK 17 or newer** (the project is tested with JDK 17+).
+
+Verify with:
+```bash
+java -version
+```
 
 ### Option 1: Gradle (Recommended)
 
@@ -86,7 +73,6 @@ gradlew.bat run
 ```
 
 To build a runnable JAR:
-
 ```bash
 ./gradlew jar
 # Output: build/libs/8-ball-pool-2.1.jar
@@ -101,19 +87,19 @@ javac -d out $(find src -name "*.java")
 java -cp out Main
 ```
 
-> The `sounds/` folder and `settings.properties` must remain in the same working directory, because the game loads them at runtime.
+> **Note:** The `sounds/` folder and `settings.properties` must remain in the same working directory, because the game loads them at runtime.
 
 ---
 
 ## 🎮 Gameplay Guide
 
-1. **Start a match** — both players enter their names on the main menu.
-2. **Choose a cue** — pick a cue type; each has a slightly different feel.
-3. **Break** — the first player breaks the rack.
-4. **Assign groups** — the first ball legally pocketed after the break decides whether you’re **solids (1–7)** or **stripes (9–15)**.
-5. **Take turns** — pocket a ball from your group to keep your turn. Miss or foul, and the turn passes.
-6. **Fouls** — pocketing the cue ball, hitting the wrong ball first, or failing to hit any ball results in a foul (opponent gets ball-in-hand).
-7. **Win** — pocket all your group’s balls first, then legally pocket the **8-ball** to win.
+1.  **Start a match** — both players enter their names on the main menu.
+2.  **Choose a cue** — pick a cue type; each has a slightly different feel.
+3.  **Break** — the first player breaks the rack.
+4.  **Assign groups** — the first ball legally pocketed after the break decides whether you’re **solids (1–7)** or **stripes (9–15)**.
+5.  **Take turns** — pocket a ball from your group to keep your turn. Miss or foul, and the turn passes.
+6.  **Fouls** — pocketing the cue ball, hitting the wrong ball first, or failing to hit any ball results in a foul (opponent gets ball-in-hand).
+7.  **Win** — pocket all your group’s balls first, then legally pocket the **8-ball** to win.
 
 > Standard 8-ball rules apply: if you pocket the 8-ball early or on a foul, you lose.
 
@@ -131,14 +117,16 @@ java -cp out Main
 
 ---
 
-## 🛠 Technologies Used
+## 🛠️ Technologies Used
 
-- **Java 17+** — language
-- **Java Swing** — GUI (JFrames, JPanels, custom painting with `Graphics2D`)
-- **Java Sound API** — sound effects (`javax.sound.sampled`)
-- **Custom physics** — vector math (`Vector.java`), collision resolution (`CollisionHandler.java`), friction & pocket logic (`PhysicsEngine.java`)
-- **MVC architecture** — `model` / `view` / `controller` + `physics` packages
-- **Gradle** — build & dependency management (with wrapper included)
+| Technology | Purpose |
+|---|---|
+| **Java 17+** | Core language |
+| **Java Swing** | GUI framework (JFrames, JPanels, custom `Graphics2D` painting) |
+| **Java Sound API** | Sound effects (`javax.sound.sampled`) |
+| **Custom Physics** | Vector math (`Vector.java`), collision resolution (`CollisionHandler.java`), friction & pocket logic (`PhysicsEngine.java`) |
+| **MVC Architecture** | Clean separation of concerns (`model` / `view` / `controller` + `physics`) |
+| **Gradle** | Build & dependency management (with wrapper included) |
 
 ---
 
@@ -189,22 +177,17 @@ java -cp out Main
 
 ## 🤝 Contributing
 
-1. Fork the repo.
-2. Create a branch: `git checkout -b feature/my-feature`.
-3. Commit your changes: `git commit -m "Add my feature"`.
-4. Push: `git push origin feature/my-feature`.
-5. Open a Pull Request.
+1.  Fork the repo.
+2.  Create a branch: `git checkout -b feature/my-feature`.
+3.  Commit your changes: `git commit -m "Add my feature"`.
+4.  Push: `git push origin feature/my-feature`.
+5.  Open a Pull Request.
 
-Please keep the **MVC separation** intact — put rendering logic in `view/`, rules in `controller/`, state in `model/`, and math/physics in `physics/`.
+Please keep the **MVC separation** intact — put rendering logic in `view/`, rules in `controller/`, state in `model/`, and physics in `physics/`.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
-
----
-
-<p align="center">
-  <i>🎱 Break, aim, and run the table — enjoy the game!</i>
-</p>
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+```
