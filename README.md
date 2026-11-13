@@ -190,4 +190,3 @@ Please keep the **MVC separation** intact — put rendering logic in `view/`, ru
 ## 📄 License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-```
